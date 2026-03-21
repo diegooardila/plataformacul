@@ -1,0 +1,16 @@
+
+postgresql://postgres:[post@Pry2026]@db.rfvzywmfpysnjinykmdr.supabase.co:5432/postgres
+
+dbname = "neonbd"
+
+host:
+db.rfvzywmfpysnjinykmdr.supabase.co
+
+port:
+5432
+
+database:
+postgres
+
+user:
+postgres
