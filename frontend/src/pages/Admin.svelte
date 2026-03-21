@@ -148,8 +148,10 @@
             second_last_name: form.second_last_name || null,
             email: form.email,
             password_hash: form.password_hash,
+            // @ts-ignore
             role_id: parseInt(form.role_id),
             faculty_id: form.faculty_id ? parseInt(form.faculty_id) : null,
+            // @ts-ignore
             status_id: parseInt(form.status_id)
         };
 
