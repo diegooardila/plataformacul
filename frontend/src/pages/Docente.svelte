@@ -8,7 +8,7 @@
 
 <div class="bg-gray-100 min-h-screen flex flex-col">
     <!-- Navbar -->
-    <div class="bg-blue-700 text-white flex justify-between items-center p-4 shadow">
+    <div class="bg-indigo-600 text-white flex justify-between items-center p-4 shadow">
         <h1 class="text-lg font-bold">Panel del Docente</h1>
         <button on:click={cerrarSesion} class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded transition shadow-sm">
             Cerrar sesión
@@ -17,7 +17,7 @@
 
     <div class="flex flex-1">
         <!-- Sidebar -->
-        <div class="w-64 bg-blue-700 text-white h-auto sm:h-[calc(100vh-60px)] shadow p-4 hidden md:block">
+        <div class="w-64 bg-indigo-600 text-white h-auto sm:h-[calc(100vh-60px)] shadow p-4 hidden md:block">
             <h2 class="font-semibold mb-4 text-sm uppercase tracking-wider text-blue-200">Menú</h2>
             <ul class="space-y-2">
                 <li><button class="w-full text-left px-3 py-2 rounded hover:bg-blue-600 transition">Cursos asignados</button></li>
