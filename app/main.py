@@ -14,6 +14,7 @@ from routes.certificates_routes import router as certificates_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 app = FastAPI()
 
@@ -48,11 +49,18 @@ if not (FRONTEND_DIR / "index.html").exists():
 
 app.mount("/assets", StaticFiles(directory=FRONTEND_DIR / "assets"), name="assets")
 
-@app.get("/{full_path:path}")
-async def serve_spa(full_path: str):
-    index_path = FRONTEND_DIR / "index.html"
-    return HTMLResponse(index_path.read_text())
+@app.get("/")
+def serve_root():
+    return FileResponse(FRONTEND_DIR / "index.html")
 
+@app.get("/{full_path:path}")
+def serve_spa(full_path: str):
+    file_path = FRONTEND_DIR / full_path
+    
+    if file_path.exists():
+        return FileResponse(file_path)
+    
+    return FileResponse(FRONTEND_DIR / "index.html")
 
 if __name__ == "__main__":
     import uvicorn
