@@ -1,6 +1,14 @@
-<script>
-    import { onMount } from 'svelte';
+<script lang="ts">
+    import { onMount } from "svelte";
     import { navigate } from "svelte-routing";
+
+    import {
+    getUsuarios,
+    getUsuario,
+    createUsuario,
+    updateUsuario,
+    deleteUsuario
+    } from '../lib/services/users';
 
     let users = [];
     let loading = true;
@@ -13,42 +21,41 @@
     let showToast = false;
 
     const statusMap = {
-        '1': 'Activo',
-        '2': 'Inactivo',
-        '3': 'Pendiente',
-        '4': 'Finalizado',
-        '5': 'Cancelado',
-        '6': 'Suspendido'
+        "1": "Activo",
+        "2": "Inactivo",
+        "3": "Pendiente",
+        "4": "Finalizado",
+        "5": "Cancelado",
+        "6": "Suspendido",
     };
 
     const roleMap = {
-        '1': 'Administrador',
-        '2': 'Docente',
-        '3': 'Estudiante'
+        "1": "Administrador",
+        "2": "Docente",
+        "3": "Estudiante",
     };
 
     const statusColorMap = {
-        '1': 'bg-green-100 text-green-700',   // Activo
-        '2': 'bg-red-100 text-red-700',       // Inactivo
-        '3': 'bg-yellow-100 text-yellow-800', // Pendiente
-        '4': 'bg-blue-100 text-blue-700',     // Finalizado
-        '5': 'bg-gray-100 text-gray-700',     // Cancelado
-        '6': 'bg-orange-100 text-orange-700'  // Suspendido
+        "1": "bg-green-100 text-green-700", // Activo
+        "2": "bg-red-100 text-red-700", // Inactivo
+        "3": "bg-yellow-100 text-yellow-800", // Pendiente
+        "4": "bg-blue-100 text-blue-700", // Finalizado
+        "5": "bg-gray-100 text-gray-700", // Cancelado
+        "6": "bg-orange-100 text-orange-700", // Suspendido
     };
-
 
     // Form data
     let form = {
-        identity_document: '',
-        first_name: '',
-        middle_name: '',
-        last_name: '',
-        second_last_name: '',
-        email: '',
-        password_hash: '',
+        identity_document: "",
+        first_name: "",
+        middle_name: "",
+        last_name: "",
+        second_last_name: "",
+        email: "",
+        password_hash: "",
         role_id: 1,
         faculty_id: null,
-        status_id: 1
+        status_id: 1,
     };
 
     onMount(() => {
@@ -58,17 +65,8 @@
     async function loadUsers() {
         loading = true;
         try {
-            // Because of our Vite proxy, this will resolve to the backend API properly
-            const res = await fetch(`/get_usuarios`);
-            if (!res.ok) {
-                if (res.status === 404) {
-                    users = [];
-                    return;
-                }
-                throw new Error('Error al cargar usuarios');
-            }
-            const data = await res.json();
-            users = data.resultado || [];
+            const data = await getUsuarios();
+            users = data || [];
         } catch (err) {
             console.error(err);
             users = [];
@@ -84,16 +82,16 @@
     function openModal() {
         editingUserId = null;
         form = {
-            identity_document: '',
-            first_name: '',
-            middle_name: '',
-            last_name: '',
-            second_last_name: '',
-            email: '',
-            password_hash: '',
+            identity_document: "",
+            first_name: "",
+            middle_name: "",
+            last_name: "",
+            second_last_name: "",
+            email: "",
+            password_hash: "",
             role_id: 1,
             faculty_id: null,
-            status_id: 1
+            status_id: 1,
         };
         isUserModalOpen = true;
     }
@@ -103,14 +101,14 @@
         form = {
             identity_document: user.identity_document,
             first_name: user.first_name,
-            middle_name: user.middle_name || '',
+            middle_name: user.middle_name || "",
             last_name: user.last_name,
-            second_last_name: user.second_last_name || '',
+            second_last_name: user.second_last_name || "",
             email: user.email,
-            password_hash: '', // Leave empty unless modifying
+            password_hash: "", // Leave empty unless modifying
             role_id: user.role_id,
             faculty_id: user.faculty_id || null,
-            status_id: user.status_id
+            status_id: user.status_id,
         };
         isUserModalOpen = true;
     }
@@ -134,7 +132,9 @@
         toastMessage = message;
         toastType = type;
         showToast = true;
-        setTimeout(() => { showToast = false; }, 3000);
+        setTimeout(() => {
+            showToast = false;
+        }, 3000);
     }
 
     async function saveUser() {
@@ -146,61 +146,52 @@
             second_last_name: form.second_last_name || null,
             email: form.email,
             password_hash: form.password_hash,
-            // @ts-ignore
-            role_id: parseInt(form.role_id),
-            faculty_id: form.faculty_id ? parseInt(form.faculty_id) : null,
-            // @ts-ignore
-            status_id: parseInt(form.status_id)
+            role_id: Number(form.role_id),
+            faculty_id: form.faculty_id ? Number(form.faculty_id) : null,
+            status_id: Number(form.status_id),
         };
 
         try {
-            let res;
             if (editingUserId) {
+                // 👇 obtener usuario actual si no hay password
                 if (!body.password_hash) {
-                    const current = await fetch(`/get_usuario/${editingUserId}`);
-                    const currentData = await current.json();
-                    body.password_hash = currentData.password_hash;
+                    const current = await getUsuario(editingUserId);
+                    body.password_hash = current.password_hash;
                 }
-                res = await fetch(`/update_usuario/${editingUserId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
+
+                await updateUsuario(editingUserId, body);
             } else {
-                res = await fetch(`/create_usuario/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
+                await createUsuario(body);
             }
 
-            if (!res.ok) throw new Error('Error al guardar');
-
             closeModal();
-            displayToast(editingUserId ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente', 'success');
+            displayToast(
+                editingUserId
+                    ? "Usuario actualizado correctamente"
+                    : "Usuario creado correctamente",
+                "success",
+            );
+
             loadUsers();
         } catch (err) {
             console.error(err);
-            displayToast('Error al guardar el usuario', 'error');
+            displayToast("Error al guardar el usuario", "error");
         }
     }
 
     async function confirmDelete() {
-        try {
-            const res = await fetch(`/delete_usuario/${deletingUserId}`, { method: 'DELETE' });
-            if (!res.ok) {
-                const errData = await res.json();
-                throw new Error(errData.detail || 'Error al eliminar');
-            }
-            closeDeleteModal();
-            displayToast('Usuario eliminado correctamente', 'success');
-            loadUsers();
-        } catch (err) {
-            console.error(err);
-            displayToast(err.message || 'Error al eliminar el usuario', 'error');
-            closeDeleteModal();
-        }
-    }
+  try {
+    await deleteUsuario(deletingUserId);
+
+    closeDeleteModal();
+    displayToast('Usuario eliminado correctamente', 'success');
+    loadUsers();
+  } catch (err) {
+    console.error(err);
+    displayToast('Error al eliminar el usuario', 'error');
+    closeDeleteModal();
+  }
+}
 </script>
 
 <div class="bg-gray-100 min-h-screen">
