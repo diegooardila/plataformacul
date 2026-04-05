@@ -26,16 +26,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(users_router)
-app.include_router(academic_periods_router)
-app.include_router(enrollments_router)
-app.include_router(faculties_router)
-app.include_router(grades_router)
-app.include_router(courses_router)
-app.include_router(classrooms_router)
-app.include_router(status_router)
-app.include_router(certificates_router)
-app.include_router(roles_router)
+app.include_router(users_router, prefix="/api")
+app.include_router(academic_periods_router, prefix="/api")
+app.include_router(enrollments_router, prefix="/api")
+app.include_router(faculties_router, prefix="/api")
+app.include_router(grades_router, prefix="/api")
+app.include_router(courses_router, prefix="/api")
+app.include_router(classrooms_router, prefix="/api")
+app.include_router(status_router, prefix="/api")
+app.include_router(certificates_router, prefix="/api")
+app.include_router(roles_router, prefix="/api")
 
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 

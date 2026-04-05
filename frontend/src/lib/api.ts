@@ -1,21 +1,26 @@
-const API_URL = "http://localhost:8000";
-
-//LLAMADO DE LA API
-
 export async function apiFetch<T>(
-  endpoint: string,
-  options: RequestInit = {}
+    endpoint: string,
+    options: {
+        method?: string;
+        headers?: Record<string, string>;
+        body?: any;
+    } = {}
 ): Promise<T> {
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    ...options,
-  });
 
-  if (!response.ok) {
-    throw new Error(`Error ${response.status}`);
-  }
+    const { body, ...rest } = options;
 
-  return response.json();
+    const res = await fetch(endpoint, {
+        ...rest,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(options.headers || {})
+        },
+        body: body ? JSON.stringify(body) : undefined
+    });
+
+    if (!res.ok) {
+        throw new Error(`HTTP error: ${res.status}`);
+    }
+
+    return res.json();
 }

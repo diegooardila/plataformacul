@@ -16,35 +16,31 @@ export interface User {
   status_id: number;
 }
 
-// GET ALL
-export const getUsuarios = () => {
-  return apiFetch<User[]>("/get_usuarios");
+type ApiResponse<T> = {
+    resultado: T;
 };
 
-// GET ONE
-export const getUsuario = (id: number) => {
-  return apiFetch<User>(`/get_usuario/${id}`);
+export const getUsuarios = async (): Promise<User[]> => {
+    const res = await apiFetch<ApiResponse<User[]>>('/api/get_usuarios');
+    return res.resultado;
 };
 
-// CREATE
-export const createUsuario = (data: Partial<User>) => {
-  return apiFetch<User>("/create_usuario/", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-};
+export const getUsuario = (id: number): Promise<User> =>
+    apiFetch(`/api/get_usuario/${id}`);
 
-// UPDATE
-export const updateUsuario = (id: number, data: Partial<User>) => {
-  return apiFetch<User>(`/update_usuario/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
-};
+export const createUsuario = (data: User) =>
+    apiFetch('/api/create_usuario/', {
+        method: 'POST',
+        body: data,
+    });
 
-// DELETE
-export const deleteUsuario = (id: number) => {
-  return apiFetch(`/delete_usuario/${id}`, {
-    method: "DELETE",
-  });
-};
+export const updateUsuario = (id: number, data: User) =>
+    apiFetch(`/api/update_usuario/${id}`, {
+        method: 'PUT',
+        body: data,
+    });
+
+export const deleteUsuario = (id: number) =>
+    apiFetch(`/api/delete_usuario/${id}`, {
+        method: 'DELETE',
+    });
