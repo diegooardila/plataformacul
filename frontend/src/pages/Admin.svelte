@@ -31,6 +31,19 @@
         "6": "Suspendido",
     };
 
+    const facultyMap = {
+        "1": "Ingeniería de Sistemas",
+        "2": "Medicina",
+        "3": "Derecho",
+        "4": "Administración de Empresas",
+        "5": "Arquitectura",
+        "6": "Psicología",
+        "7": "Economía",
+        "8": "Comunicación Social",
+        "9": "Biología",
+        "10": "Matemáticas",
+    };
+
     const roleMap = {
         "1": "Administrador",
         "2": "Docente",
@@ -403,7 +416,7 @@
                                             ></td
                                         >
                                         <td class="px-4 py-3 text-gray-600"
-                                            >{u.faculty_id ?? "-"}</td
+                                            >{facultyMap[String(u.faculty_id)] || u.faculty_id}</td
                                         >
                                         <td class="px-4 py-3"
                                             ><span
