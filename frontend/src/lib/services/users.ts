@@ -24,6 +24,7 @@ type ApiResponse<T> = {
 
 
 export const getUsuarios = async (): Promise<User[]> => {
+    console.log("llamando getUsuarios...");
     const res = await apiFetch<ApiResponse<User[]>>('/api/get_usuarios');
     return res.resultado;
 };

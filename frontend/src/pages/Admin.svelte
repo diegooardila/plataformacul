@@ -3,14 +3,14 @@
     import { navigate } from "svelte-routing";
 
     import {
-    getUsuarios,
-    getUsuario,
-    createUsuario,
-    updateUsuario,
-    deleteUsuario
-    } from '../lib/services/users';
+        getUsuarios,
+        getUsuario,
+        createUsuario,
+        updateUsuario,
+        deleteUsuario,
+    } from "../lib/services/users";
 
-    import type { UserCreate } from '/PlataformaCUL/frontend/src/lib/services/users';
+    import type { UserCreate } from "../lib/services/users";
 
     let users = [];
     let loading = true;
@@ -59,8 +59,10 @@
         faculty_id: null,
         status_id: 1,
     };
+    console.log("Admin.svelte cargado");
 
     onMount(() => {
+        console.log("onMount ejecutado");
         loadUsers();
     });
 
@@ -68,6 +70,7 @@
         loading = true;
         try {
             const data = await getUsuarios();
+            console.log("Respuesta API:", data);
             users = data || [];
         } catch (err) {
             console.error(err);
@@ -182,18 +185,20 @@
     }
 
     async function confirmDelete() {
-  try {
-    await deleteUsuario(deletingUserId);
+        try {
+            await deleteUsuario(deletingUserId);
 
-    closeDeleteModal();
-    displayToast('Usuario eliminado correctamente', 'success');
-    loadUsers();
-  } catch (err) {
-    console.error(err);
-    displayToast('Error al eliminar el usuario', 'error');
-    closeDeleteModal();
-  }
-}
+            closeDeleteModal();
+            displayToast("Usuario eliminado correctamente", "success");
+            loadUsers();
+        } catch (err) {
+            console.error(err);
+            displayToast("Error al eliminar el usuario", "error");
+            closeDeleteModal();
+        }
+    }
+
+    
 </script>
 
 <div class="bg-gray-100 min-h-screen">
@@ -470,10 +475,11 @@
     <!-- Modal Crear/Editar -->
     {#if isUserModalOpen}
         <div class="fixed inset-0 z-40 flex items-center justify-center">
-            <div
+            <button
                 class="absolute inset-0 bg-black/50"
                 on:click={closeModal}
-            ></div>
+                aria-label="Cerrar modal"
+            />
             <div
                 class="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto"
             >
@@ -688,10 +694,12 @@
     <!-- Modal Confirmar Eliminar -->
     {#if isDeleteModalOpen}
         <div class="fixed inset-0 z-40 flex items-center justify-center">
-            <div
+            <button
                 class="absolute inset-0 bg-black/50"
                 on:click={closeDeleteModal}
-            ></div>
+                aria-label="Cerrar modal"
+            ></button>
+
             <div
                 class="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6"
             >
