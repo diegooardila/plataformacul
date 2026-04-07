@@ -16,9 +16,12 @@ export interface User {
   status_id: number;
 }
 
+export type UserCreate = Omit<User, 'user_id'>;
+
 type ApiResponse<T> = {
     resultado: T;
 };
+
 
 export const getUsuarios = async (): Promise<User[]> => {
     const res = await apiFetch<ApiResponse<User[]>>('/api/get_usuarios');
@@ -28,13 +31,13 @@ export const getUsuarios = async (): Promise<User[]> => {
 export const getUsuario = (id: number): Promise<User> =>
     apiFetch(`/api/get_usuario/${id}`);
 
-export const createUsuario = (data: User) =>
+export const createUsuario = (data: UserCreate) =>
     apiFetch('/api/create_usuario/', {
         method: 'POST',
         body: data,
     });
 
-export const updateUsuario = (id: number, data: User) =>
+export const updateUsuario = (id: number, data: UserCreate) =>
     apiFetch(`/api/update_usuario/${id}`, {
         method: 'PUT',
         body: data,

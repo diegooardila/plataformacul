@@ -10,6 +10,8 @@
     deleteUsuario
     } from '../lib/services/users';
 
+    import type { UserCreate } from '/PlataformaCUL/frontend/src/lib/services/users';
+
     let users = [];
     let loading = true;
     let editingUserId = null;
@@ -138,7 +140,7 @@
     }
 
     async function saveUser() {
-        const body = {
+        const body: UserCreate = {
             identity_document: form.identity_document,
             first_name: form.first_name,
             middle_name: form.middle_name || null,
