@@ -6,3 +6,5 @@ class AcademicPeriod(BaseModel):
     period_code: str
     start_date: date
     end_date: date
+    created_at: str | None = None
+    updated_at: str | None = None

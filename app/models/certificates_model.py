@@ -6,3 +6,5 @@ class Certificate(BaseModel):
     enrollment_id: int
     verification_code: str
     issue_date: datetime
+    created_at: str | None = None
+    updated_at: str | None = None

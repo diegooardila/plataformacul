@@ -12,3 +12,5 @@ class User(BaseModel):
     role_id: int
     faculty_id: int | None = None
     status_id: int
+    created_at: str | None = None
+    updated_at: str | None = None
