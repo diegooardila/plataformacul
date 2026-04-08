@@ -10,3 +10,5 @@ class Courses(BaseModel):
     clasroom: str
     period_id: int
     status: int
+    created_at: str | None = None
+    updated_at: str | None = None

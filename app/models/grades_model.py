@@ -6,3 +6,5 @@ class Grade(BaseModel):
     enrollment_id: int
     final_grade: Decimal
     observations: str | None = None
+    created_at: str | None = None
+    updated_at: str | None = None
