@@ -1,20 +1,53 @@
-<script>
+<script lang="ts">
     import { navigate } from "svelte-routing";
+    import { login } from "../lib/services/auth";
 
     let username = "";
     let password = "";
+    let isLoading = false;
+    let errorMessage = "";
+    let selectedRole = 3; // 1: Admin, 2: Docente, 3: Estudiante
 
-    function ingresarEstudiante() {
-        // En una app real, aqui iria la autenticacion
-        navigate("/estudiante");
-    }
+    async function handleLogin() {
+        if (!username || !password) {
+            errorMessage = "Por favor ingresa tu correo y contraseña";
+            return;
+        }
 
-    function ingresarDocente() {
-        navigate("/docente");
-    }
+        isLoading = true;
+        errorMessage = "";
 
-    function ingresarAdmin() {
-        navigate("/admin");
+        try {
+            const res = await login(username, password, selectedRole);
+            const user = res.resultado.user;
+            
+            // Validar si el rol que el usuario escogió en la interfaz coincide exactamente con su rol en la BD
+            let allowed = false;
+            
+            if (user.role_id === selectedRole) {
+                allowed = true; // Logró hacer match correcto
+            }
+
+            if (!allowed) {
+                errorMessage = "Credenciales Incorrectas. Intenta Cambiar De Rol";
+                logout(); // Purgamos el Storage
+                return;
+            }
+            
+            // Redirigir basado en el rol de destino seleccionado
+            if (selectedRole === 1) {
+                navigate("/admin");
+            } else if (selectedRole === 2) {
+                navigate("/docente");
+            } else if (selectedRole === 3) {
+                navigate("/estudiante");
+            }
+        } catch (err) {
+            errorMessage = "Correo o contraseña incorrectos";
+            console.error(err);
+        } finally {
+            isLoading = false;
+        }
     }
 </script>
 
@@ -29,7 +62,6 @@
             <p class="text-gray-600 max-w-sm">
                 PLATAFORMA DE INSCRIPCIÓN Y CONTROL DE CURSOS ELECTIVOS.
             </p>
-            <!-- Note: You might need to move `img/logo-03.jpg` to `public/img` in Vite -->
             <img src="/img/logo.png" alt="Logo CUL" class="w-48 mt-8 drop-shadow-md" />
         </div>
 
@@ -39,28 +71,35 @@
                 Iniciar sesión
             </h2>
 
-            <form class="space-y-5" on:submit|preventDefault>
+            {#if errorMessage}
+                <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 border border-red-100 text-center">
+                    {errorMessage}
+                </div>
+            {/if}
+
+            <form class="space-y-5" on:submit|preventDefault={handleLogin}>
                 <div>
-                    <label class="block text-gray-600 text-sm mb-1" for="username">Usuario</label>
-                    <input id="username" type="text" bind:value={username} class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    <label class="block text-gray-600 text-sm mb-1" for="username">Correo Electrónico</label>
+                    <input id="username" type="text" bind:value={username} required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                 </div>
 
                 <div>
                     <label class="block text-gray-600 text-sm mb-1" for="password">Contraseña</label>
-                    <input id="password" type="password" bind:value={password} class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    <input id="password" type="password" bind:value={password} required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                 </div>
 
-                <div class="space-y-3 pt-2">
-                    <button type="button" on:click={ingresarEstudiante} class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition shadow-sm">
-                        Ingresar como Estudiante
-                    </button>
+                <div>
+                    <label class="block text-gray-600 text-sm mb-2">Ingresar Destino</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" class="{selectedRole === 3 ? 'bg-blue-100 text-blue-700 border-blue-500' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'} border rounded-lg py-2 text-sm font-medium transition" on:click={() => selectedRole = 3}>Estudiante</button>
+                        <button type="button" class="{selectedRole === 2 ? 'bg-indigo-100 text-indigo-700 border-indigo-500' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'} border rounded-lg py-2 text-sm font-medium transition" on:click={() => selectedRole = 2}>Docente</button>
+                        <button type="button" class="{selectedRole === 1 ? 'bg-gray-800 text-gray-100 border-gray-900' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'} border rounded-lg py-2 text-sm font-medium transition" on:click={() => selectedRole = 1}>Admin</button>
+                    </div>
+                </div>
 
-                    <button type="button" on:click={ingresarDocente} class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition shadow-sm">
-                        Ingresar como Docente
-                    </button>
-
-                    <button type="button" on:click={ingresarAdmin} class="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 rounded-lg transition shadow-sm">
-                        Ingresar como Administrador
+                <div class="pt-2">
+                    <button type="submit" disabled={isLoading} class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition shadow-sm {isLoading ? 'opacity-70 cursor-not-allowed' : ''}">
+                        {isLoading ? 'Verificando...' : 'Ingresar'}
                     </button>
                 </div>
             </form>

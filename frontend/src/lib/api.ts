@@ -9,12 +9,19 @@ export async function apiFetch<T>(
 
     const { body, ...rest } = options;
 
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+    };
+
+    const token = localStorage.getItem('token');
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const res = await fetch(endpoint, {
         ...rest,
-        headers: {
-            'Content-Type': 'application/json',
-            ...(options.headers || {})
-        },
+        headers,
         body: body ? JSON.stringify(body) : undefined
     });
 

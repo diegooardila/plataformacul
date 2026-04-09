@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from routes.academic_periods_routes import router as academic_periods_router
+from routes.auth_routes import router as auth_router
 from routes.users_routes import router as users_router
 from routes.faculties_routes import router as faculties_router
 from routes.roles_routes import router as roles_router
@@ -26,6 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
 app.include_router(academic_periods_router, prefix="/api")
 app.include_router(enrollments_router, prefix="/api")
