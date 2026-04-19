@@ -209,13 +209,18 @@
         </div>
     {/if}
 
-    <iframe
-        title="gestionCursosCUL"
-        width="100%"
-        height="541.25"
-        src="https://app.powerbi.com/reportEmbed?reportId=8966942f-e3ca-4cc8-a31c-7070054c0250&autoAuth=true&ctid=740be6bd-fd36-470e-94d9-0f0c777fadb9"
-        frameborder="0"
-        allowFullScreen="true"
+    <div
+        class="w-full overflow-hidden rounded-xl shadow-sm border border-gray-100 bg-white"
     >
-    </iframe>
+        <iframe
+            title="gestionCursosCUL"
+            width="100%"
+            height="700"
+            src="https://app.powerbi.com/reportEmbed?reportId=8966942f-e3ca-4cc8-a31c-7070054c0250&autoAuth=true&ctid=740be6bd-fd36-470e-94d9-0f0c777fadb9"
+            frameborder="0"
+            allowFullScreen="true"
+            style="min-height: 700px;"
+        >
+        </iframe>
+    </div>
 </div>
