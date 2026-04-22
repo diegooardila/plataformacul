@@ -1,6 +1,6 @@
 <script lang="ts">
     import { navigate } from "svelte-routing";
-    import { login } from "../lib/services/auth";
+    import { login, logout } from "../lib/services/auth";
 
     let username = "";
     let password = "";

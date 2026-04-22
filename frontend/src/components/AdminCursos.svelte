@@ -171,7 +171,7 @@
     <!-- Tabla Cursos -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
         <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+            <table class="w-full text-sm min-w-[700px]">
                 <thead class="bg-gray-50 border-b">
                     <tr>
                         <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Código</th>

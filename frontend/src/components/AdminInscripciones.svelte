@@ -165,7 +165,7 @@
 
     <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
         <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+            <table class="w-full text-sm min-w-[700px]">
                 <thead class="bg-gray-50 border-b">
                     <tr>
                         <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">ID Insc.</th>
@@ -208,7 +208,7 @@
     {#if isEnrollmentModalOpen}
         <div class="fixed inset-0 z-40 flex items-center justify-center">
             <button class="absolute inset-0 bg-black/50" on:click={closeModal} aria-label="Cerrar modal"></button>
-            <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-y-auto">
+            <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-center p-6 border-b border-gray-100">
                     <h3 class="text-xl font-bold text-gray-800">Matricular Estudiante</h3>
                     <button on:click={closeModal} class="text-gray-400 hover:text-gray-600 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>

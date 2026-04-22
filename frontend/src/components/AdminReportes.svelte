@@ -51,7 +51,7 @@
                 let maxCount = 0;
                 let maxId = null;
                 for (const [cId, count] of Object.entries(countMap)) {
-                    if (count > maxCount) {
+                    if ((count as number) > maxCount) {
                         maxCount = count as number;
                         maxId = parseInt(cId);
                     }
@@ -215,11 +215,10 @@
         <iframe
             title="gestionCursosCUL"
             width="100%"
-            height="700"
             src="https://app.powerbi.com/reportEmbed?reportId=8966942f-e3ca-4cc8-a31c-7070054c0250&autoAuth=true&ctid=740be6bd-fd36-470e-94d9-0f0c777fadb9"
             frameborder="0"
-            allowFullScreen="true"
-            style="min-height: 700px;"
+            allowFullScreen={true}
+            style="height: clamp(400px, 60vw, 700px); display: block;"
         >
         </iframe>
     </div>
