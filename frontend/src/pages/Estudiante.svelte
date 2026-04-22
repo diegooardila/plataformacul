@@ -113,7 +113,7 @@
 
 <div class="bg-gray-100 min-h-screen flex flex-col">
     <!-- Navbar -->
-    <nav class="bg-blue-700 text-white flex justify-between items-center p-4 shadow z-30 relative">
+    <nav class="bg-blue-950 text-white flex justify-between items-center p-4 shadow z-30 relative">
         <div class="flex items-center gap-3">
             <button on:click={toggleMobileMenu} class="md:hidden p-1.5 hover:bg-white/10 rounded transition" aria-label="Menú">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -150,13 +150,13 @@
             </div>
         {:else}
             <!-- Sidebar -->
-            <div class="{isMobileMenuOpen ? 'flex' : 'hidden'} md:flex shrink-0 flex-col absolute inset-y-0 left-0 md:relative z-50 w-64 bg-blue-700 text-white shadow p-4 h-full border-r border-blue-600 transition-transform duration-300">
+            <div class="{isMobileMenuOpen ? 'flex' : 'hidden'} md:flex shrink-0 flex-col absolute inset-y-0 left-0 md:relative z-50 w-64 bg-blue-950 text-white shadow p-4 h-full border-r border-blue-900 transition-transform duration-300">
                 <h2 class="font-semibold mb-4 text-sm uppercase tracking-wider text-blue-200">Menú</h2>
             <ul class="space-y-2">
-                <li><button on:click={() => { setView('dashboard'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'dashboard' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Dashboard</button></li>
-                <li><button on:click={() => { setView('cursos'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'cursos' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Cursos disponibles</button></li>
-                <li><button on:click={() => { setView('inscripciones'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'inscripciones' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Mis inscripciones</button></li>
-                <li><button on:click={() => { setView('perfil'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'perfil' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Perfil</button></li>
+                <li><button on:click={() => { setView('dashboard'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'dashboard' ? 'bg-blue-900 shadow-sm' : 'hover:bg-blue-900'}">Dashboard</button></li>
+                <li><button on:click={() => { setView('cursos'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'cursos' ? 'bg-blue-900 shadow-sm' : 'hover:bg-blue-900'}">Cursos disponibles</button></li>
+                <li><button on:click={() => { setView('inscripciones'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'inscripciones' ? 'bg-blue-900 shadow-sm' : 'hover:bg-blue-900'}">Mis inscripciones</button></li>
+                <li><button on:click={() => { setView('perfil'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'perfil' ? 'bg-blue-900 shadow-sm' : 'hover:bg-blue-900'}">Perfil</button></li>
             </ul>
         </div>
 
@@ -175,7 +175,7 @@
                     <p class="text-gray-500">Cargando tus cursos...</p>
                 {:else if myCourses.length === 0}
                     <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
-                        <p class="text-blue-800">No estás inscrito en ningún curso actualmente. Ve a "Cursos disponibles" para inscribirte.</p>
+                        <p class="text-blue-900">No estás inscrito en ningún curso actualmente. Ve a "Cursos disponibles" para inscribirte.</p>
                     </div>
                 {:else}
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -205,7 +205,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {#each availableCourses as curso}
                             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
-                                <h3 class="text-xl font-bold text-blue-800 mb-2">{curso.course_name}</h3>
+                                <h3 class="text-xl font-bold text-blue-900 mb-2">{curso.course_name}</h3>
                                 <p class="text-gray-600 text-sm mb-1"><strong>Código:</strong> {curso.course_code}</p>
                                 <p class="text-gray-600 text-sm mb-1"><strong>Horario:</strong> {curso.schedule}</p>
                                 <p class="text-gray-600 text-sm mb-4"><strong>Cupos:</strong> {curso.max_capacity}</p>
@@ -213,7 +213,7 @@
                                 {#if myCourses.some(mc => mc.course_id === curso.course_id)}
                                     <button disabled class="w-full bg-gray-300 text-gray-500 font-medium py-2 rounded-lg cursor-not-allowed">Ya inscrito</button>
                                 {:else}
-                                    <button on:click={() => tryEnroll(curso.course_id)} class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition cursor-pointer">Inscribirme</button>
+                                    <button on:click={() => tryEnroll(curso.course_id)} class="w-full bg-blue-900 hover:bg-blue-800 text-white font-medium py-2 rounded-lg transition cursor-pointer">Inscribirme</button>
                                 {/if}
                             </div>
                         {/each}
@@ -255,7 +255,7 @@
                 <h2 class="text-3xl font-bold text-gray-800 mb-6">Mi Perfil</h2>
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-100 max-w-2xl">
                     <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 mb-8">
-                        <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-3xl font-bold uppercase shrink-0">
+                        <div class="w-20 h-20 bg-blue-100 text-blue-900 rounded-full flex items-center justify-center text-3xl font-bold uppercase shrink-0">
                             {studentName.charAt(0)}
                         </div>
                         <div>
