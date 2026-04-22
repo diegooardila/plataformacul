@@ -15,10 +15,14 @@
     let toastType = "success";
     let showToast = false;
 
-    // Variables de sesión dinámica
     let studentId = null;
     let studentName = "Estudiante";
     let studentStatusId = null;
+    let isMobileMenuOpen = false;
+
+    function toggleMobileMenu() {
+        isMobileMenuOpen = !isMobileMenuOpen;
+    }
 
     onMount(() => {
         const session = getSession();
@@ -109,12 +113,17 @@
 
 <div class="bg-gray-100 min-h-screen flex flex-col">
     <!-- Navbar -->
-    <div class="bg-blue-700 text-white flex justify-between items-center p-4 shadow z-10 relative">
-        <h1 class="text-lg font-bold">Panel del Estudiante</h1>
+    <nav class="bg-blue-700 text-white flex justify-between items-center p-4 shadow z-30 relative">
+        <div class="flex items-center gap-3">
+            <button on:click={toggleMobileMenu} class="md:hidden p-1.5 hover:bg-white/10 rounded transition" aria-label="Menú">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <h1 class="text-lg font-bold">Panel del Estudiante</h1>
+        </div>
         <button on:click={cerrarSesion} class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded transition shadow-sm cursor-pointer">
             Cerrar sesión
         </button>
-    </div>
+    </nav>
 
     <!-- Toast Message -->
     {#if showToast}
@@ -123,7 +132,11 @@
         </div>
     {/if}
 
-    <div class="flex flex-1 items-stretch">
+    <div class="flex flex-1 items-stretch relative">
+        {#if isMobileMenuOpen}
+            <button class="md:hidden fixed inset-0 w-full h-full bg-black/50 z-40 transition-opacity border-0" on:click={toggleMobileMenu} aria-label="Cerrar modal"></button>
+        {/if}
+
         {#if studentStatusId !== 1}
             <div class="w-full flex flex-col items-center justify-center p-6 bg-gray-50">
                <div class="bg-red-50 p-10 rounded-2xl w-full max-w-lg text-center border border-red-100 shadow">
@@ -137,18 +150,18 @@
             </div>
         {:else}
             <!-- Sidebar -->
-            <div class="w-64 bg-blue-700 text-white shadow p-4 hidden md:block">
+            <div class="{isMobileMenuOpen ? 'flex' : 'hidden'} md:flex shrink-0 flex-col absolute inset-y-0 left-0 md:relative z-50 w-64 bg-blue-700 text-white shadow p-4 h-full border-r border-blue-600 transition-transform duration-300">
                 <h2 class="font-semibold mb-4 text-sm uppercase tracking-wider text-blue-200">Menú</h2>
             <ul class="space-y-2">
-                <li><button on:click={() => setView('dashboard')} class="w-full text-left px-3 py-2 rounded transition {currentView === 'dashboard' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Dashboard</button></li>
-                <li><button on:click={() => setView('cursos')} class="w-full text-left px-3 py-2 rounded transition {currentView === 'cursos' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Cursos disponibles</button></li>
-                <li><button on:click={() => setView('inscripciones')} class="w-full text-left px-3 py-2 rounded transition {currentView === 'inscripciones' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Mis inscripciones</button></li>
-                <li><button on:click={() => setView('perfil')} class="w-full text-left px-3 py-2 rounded transition {currentView === 'perfil' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Perfil</button></li>
+                <li><button on:click={() => { setView('dashboard'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'dashboard' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Dashboard</button></li>
+                <li><button on:click={() => { setView('cursos'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'cursos' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Cursos disponibles</button></li>
+                <li><button on:click={() => { setView('inscripciones'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'inscripciones' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Mis inscripciones</button></li>
+                <li><button on:click={() => { setView('perfil'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'perfil' ? 'bg-blue-600 shadow-sm' : 'hover:bg-blue-600'}">Perfil</button></li>
             </ul>
         </div>
 
         <!-- Contenido -->
-        <div class="flex-1 p-6 sm:p-10">
+        <div class="flex-1 p-4 sm:p-6 lg:p-8 min-w-0 overflow-x-hidden">
             {#if currentView === 'dashboard'}
                 <h2 class="text-3xl font-bold text-gray-800 mb-6">
                     Bienvenido/a, {studentName}
@@ -213,8 +226,8 @@
                         <p class="text-gray-600">Aún no tienes inscripciones activas.</p>
                     </div>
                 {:else}
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                        <table class="w-full text-sm">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+                        <table class="w-full text-sm min-w-[600px]">
                             <thead class="bg-gray-50 border-b">
                                 <tr>
                                     <th class="text-left px-6 py-3 text-gray-600 font-semibold">Código</th>
@@ -240,9 +253,9 @@
                 {/if}
             {:else if currentView === 'perfil'}
                 <h2 class="text-3xl font-bold text-gray-800 mb-6">Mi Perfil</h2>
-                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 max-w-2xl">
-                    <div class="flex items-center gap-6 mb-8">
-                        <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-3xl font-bold uppercase">
+                <div class="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-100 max-w-2xl">
+                    <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 mb-8">
+                        <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-3xl font-bold uppercase shrink-0">
                             {studentName.charAt(0)}
                         </div>
                         <div>
@@ -251,13 +264,13 @@
                         </div>
                     </div>
                     <div class="space-y-4">
-                        <div class="grid grid-cols-3 border-b border-gray-50 pb-4">
-                            <span class="text-gray-500 font-medium">Nombre de usuario</span>
-                            <span class="col-span-2 text-gray-800 font-medium">{studentName}</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 border-b border-gray-50 pb-4 gap-1 sm:gap-4">
+                            <span class="text-gray-500 font-medium sm:col-span-1">Nombre de usuario</span>
+                            <span class="text-gray-800 font-medium sm:col-span-2">{studentName}</span>
                         </div>
-                        <div class="grid grid-cols-3 border-b border-gray-50 pb-4">
-                            <span class="text-gray-500 font-medium">ID del Sistema</span>
-                            <span class="col-span-2 text-gray-800 font-medium">{studentId}</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 border-b border-gray-50 pb-4 gap-1 sm:gap-4">
+                            <span class="text-gray-500 font-medium sm:col-span-1">ID del Sistema</span>
+                            <span class="text-gray-800 font-medium sm:col-span-2">{studentId}</span>
                         </div>
                     </div>
                 </div>

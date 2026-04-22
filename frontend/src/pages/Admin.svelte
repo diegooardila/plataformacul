@@ -17,6 +17,11 @@
     import AdminReportes from "../components/AdminReportes.svelte";
 
     let currentView = "usuarios";
+    let isMobileMenuOpen = false;
+
+    function toggleMobileMenu() {
+        isMobileMenuOpen = !isMobileMenuOpen;
+    }
 
     onMount(() => {
         const session = getSession();
@@ -232,16 +237,12 @@
 
 <div class="bg-gray-100 min-h-screen">
     <!-- Navbar -->
-    <nav
-        class="bg-gray-800 text-white flex justify-between items-center px-6 py-3 shadow-lg sticky top-0 z-10"
-    >
+    <nav class="bg-gray-800 text-white flex justify-between items-center px-6 py-3 shadow-lg sticky top-0 z-30">
         <div class="flex items-center gap-3">
-            <svg
-                class="w-7 h-7 text-blue-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-            >
+            <button on:click={toggleMobileMenu} class="md:hidden p-1.5 hover:bg-white/10 rounded transition" aria-label="Menú">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -259,62 +260,46 @@
         </button>
     </nav>
 
-    <div class="flex">
+    <div class="flex relative">
+        {#if isMobileMenuOpen}
+            <button class="md:hidden fixed inset-0 w-full h-full bg-black/50 z-40 transition-opacity border-0" on:click={toggleMobileMenu} aria-label="Cerrar modal"></button>
+        {/if}
+
         <!-- Sidebar -->
-        <aside
-            class="w-64 bg-gray-800 border-r border-gray-700 min-h-[calc(100vh-60px)] shadow-md p-5 hidden md:block"
-        >
-            <h2
-                class="font-semibold text-gray-400 text-xs uppercase tracking-wider mb-4"
-            >
+        <aside class="{isMobileMenuOpen ? 'flex' : 'hidden'} md:flex shrink-0 flex-col absolute inset-y-0 left-0 md:relative z-50 w-64 bg-gray-800 border-r border-gray-700 min-h-[calc(100vh-60px)] shadow-md p-5 h-full transition-transform duration-300">
+            <h2 class="font-semibold text-gray-400 text-xs uppercase tracking-wider mb-4">
                 Administración
             </h2>
             <ul class="space-y-1">
                 <li>
                     <button
-                        on:click={() => (currentView = "usuarios")}
-                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView ===
-                        'usuarios'
-                            ? 'bg-blue-600 text-white shadow'
-                            : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
-                        >Gestionar Usuarios</button
-                    >
+                        on:click={() => { currentView = "usuarios"; isMobileMenuOpen = false; }}
+                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'usuarios' ? 'bg-blue-600 text-white shadow' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
+                        >Gestionar Usuarios</button>
                 </li>
                 <li>
                     <button
-                        on:click={() => (currentView = "cursos")}
-                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView ===
-                        'cursos'
-                            ? 'bg-blue-600 text-white shadow'
-                            : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
-                        >Gestionar Cursos</button
-                    >
+                        on:click={() => { currentView = "cursos"; isMobileMenuOpen = false; }}
+                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'cursos' ? 'bg-blue-600 text-white shadow' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
+                        >Gestionar Cursos</button>
                 </li>
                 <li>
                     <button
-                        on:click={() => (currentView = "inscripciones")}
-                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView ===
-                        'inscripciones'
-                            ? 'bg-blue-600 text-white shadow'
-                            : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
-                        >Gestionar Inscripciones</button
-                    >
+                        on:click={() => { currentView = "inscripciones"; isMobileMenuOpen = false; }}
+                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'inscripciones' ? 'bg-blue-600 text-white shadow' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
+                        >Gestionar Inscripciones</button>
                 </li>
                 <li>
                     <button
-                        on:click={() => (currentView = "reportes")}
-                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView ===
-                        'reportes'
-                            ? 'bg-blue-600 text-white shadow'
-                            : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
-                        >Reportes</button
-                    >
+                        on:click={() => { currentView = "reportes"; isMobileMenuOpen = false; }}
+                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'reportes' ? 'bg-blue-600 text-white shadow' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
+                        >Reportes</button>
                 </li>
             </ul>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-6 sm:p-8">
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 min-w-0 overflow-x-hidden">
             {#if currentView === "usuarios"}
                 <!-- Header -->
                 <div
@@ -366,7 +351,7 @@
                     class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100"
                 >
                     <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
+                        <table class="w-full text-sm min-w-[1000px]">
                             <thead class="bg-gray-50 border-b">
                                 <tr>
                                     <th

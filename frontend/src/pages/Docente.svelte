@@ -11,6 +11,11 @@
     let myStudentsByCourse = {}; // Record<courseId, Student[]>
     let loading = true;
 
+    let isMobileMenuOpen = false;
+    function toggleMobileMenu() {
+        isMobileMenuOpen = !isMobileMenuOpen;
+    }
+
     // For demonstration, fetch all teachers and pick the first one as mock logged in user.
     let teacherId = null;
     let teacherName = "";
@@ -89,17 +94,24 @@
 
 <div class="bg-gray-100 min-h-screen flex flex-col">
     <!-- Navbar -->
-    <div class="bg-indigo-700 text-white flex justify-between items-center p-4 shadow z-10 relative">
+    <nav class="bg-indigo-700 text-white flex justify-between items-center p-4 shadow z-30 relative">
         <div class="flex items-center gap-3">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v7"/></svg>
+            <button on:click={toggleMobileMenu} class="md:hidden p-1.5 hover:bg-white/10 rounded transition" aria-label="Menú">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <svg class="w-6 h-6 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v7"/></svg>
             <h1 class="text-lg font-bold">Panel del Docente</h1>
         </div>
         <button on:click={cerrarSesion} class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded transition shadow-sm cursor-pointer text-sm font-medium">
             Cerrar sesión
         </button>
-    </div>
+    </nav>
 
-    <div class="flex flex-1 items-stretch">
+    <div class="flex flex-1 items-stretch relative">
+        {#if isMobileMenuOpen}
+            <button class="md:hidden fixed inset-0 w-full h-full bg-black/50 z-40 transition-opacity border-0" on:click={toggleMobileMenu} aria-label="Cerrar modal"></button>
+        {/if}
+
         {#if teacherStatusId !== 1}
             <div class="w-full flex flex-col items-center justify-center p-6 bg-gray-50">
                <div class="bg-red-50 p-10 rounded-2xl w-full max-w-lg text-center border border-red-100 shadow">
@@ -113,17 +125,17 @@
             </div>
         {:else}
             <!-- Sidebar -->
-            <div class="w-64 bg-indigo-800 text-white shadow p-5 hidden md:block">
+            <div class="{isMobileMenuOpen ? 'flex' : 'hidden'} md:flex shrink-0 flex-col absolute inset-y-0 left-0 md:relative z-50 w-64 bg-indigo-800 text-white shadow p-5 h-full border-r border-indigo-700 transition-transform duration-300">
                 <h2 class="font-semibold mb-6 text-xs uppercase tracking-wider text-indigo-300">Menú Docente</h2>
                 <ul class="space-y-1">
-                <li><button on:click={() => setView('dashboard')} class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition {currentView === 'dashboard' ? 'bg-indigo-600 shadow' : 'hover:bg-indigo-700 text-indigo-100'}">Inicio</button></li>
-                <li><button on:click={() => setView('mis_cursos')} class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition {currentView === 'mis_cursos' ? 'bg-indigo-600 shadow' : 'hover:bg-indigo-700 text-indigo-100'}">Mis Cursos</button></li>
-                <li><button on:click={() => setView('mis_estudiantes')} class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition {currentView === 'mis_estudiantes' ? 'bg-indigo-600 shadow' : 'hover:bg-indigo-700 text-indigo-100'}">Estudiantes Inscritos</button></li>
+                <li><button on:click={() => { setView('dashboard'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition {currentView === 'dashboard' ? 'bg-indigo-600 shadow' : 'hover:bg-indigo-700 text-indigo-100'}">Inicio</button></li>
+                <li><button on:click={() => { setView('mis_cursos'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition {currentView === 'mis_cursos' ? 'bg-indigo-600 shadow' : 'hover:bg-indigo-700 text-indigo-100'}">Mis Cursos</button></li>
+                <li><button on:click={() => { setView('mis_estudiantes'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition {currentView === 'mis_estudiantes' ? 'bg-indigo-600 shadow' : 'hover:bg-indigo-700 text-indigo-100'}">Estudiantes Inscritos</button></li>
             </ul>
         </div>
 
         <!-- Contenido -->
-        <div class="flex-1 p-6 sm:p-10">
+        <div class="flex-1 p-4 sm:p-6 lg:p-8 min-w-0 overflow-x-hidden">
             {#if loading}
                 <div class="flex h-full items-center justify-center">
                     <p class="text-gray-500 font-medium">Cargando datos del docente...</p>
@@ -181,11 +193,11 @@
                                         <h3 class="text-lg font-bold text-indigo-900">{curso.course_name} <span class="text-xs font-normal text-indigo-600 bg-white px-2 py-0.5 rounded border border-indigo-200 ml-2">{curso.course_code}</span></h3>
                                         <span class="text-sm font-medium text-indigo-700">{(myStudentsByCourse[curso.course_id] || []).length} inscritos</span>
                                     </div>
-                                    <div class="p-0">
+                                    <div class="p-0 overflow-x-auto">
                                         {#if (myStudentsByCourse[curso.course_id] || []).length === 0}
                                             <p class="p-6 text-gray-500 text-center text-sm">Este curso aún no tiene inscripciones.</p>
                                         {:else}
-                                            <table class="w-full text-sm">
+                                            <table class="w-full text-sm min-w-[600px]">
                                                 <thead class="bg-gray-50 border-b">
                                                     <tr>
                                                         <th class="text-left px-6 py-3 text-gray-600 font-semibold">Documento</th>
