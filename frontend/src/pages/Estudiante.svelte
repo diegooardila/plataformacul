@@ -6,6 +6,11 @@
     import { createEnrollment, getEnrollments } from "../lib/services/enrollments";
     import { getSession, logout } from "../lib/services/auth";
     import DataTable from "../components/DataTable.svelte";
+    import Toast from "../components/ui/Toast.svelte";
+    import Card from "../components/ui/Card.svelte";
+    import Badge from "../components/ui/Badge.svelte";
+    import Button from "../components/ui/Button.svelte";
+    import PageHeader from "../components/ui/PageHeader.svelte";
 
     let currentView = 'dashboard';
     let availableCourses = [];
@@ -121,17 +126,13 @@
             </button>
             <h1 class="text-lg font-bold">Panel del Estudiante</h1>
         </div>
-        <button on:click={cerrarSesion} class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded transition shadow-sm cursor-pointer">
+        <Button on:click={cerrarSesion} variant="danger" class="px-4 py-1.5 text-sm">
             Cerrar sesión
-        </button>
+        </Button>
     </nav>
 
     <!-- Toast Message -->
-    {#if showToast}
-        <div class="fixed top-20 right-5 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium z-50 transition-all {toastType === 'success' ? 'bg-green-600' : 'bg-red-600'}">
-            {toastMessage}
-        </div>
-    {/if}
+    <Toast message={toastMessage} type={toastType} show={showToast} />
 
     <div class="flex flex-1 items-stretch relative">
         {#if isMobileMenuOpen}
@@ -151,7 +152,7 @@
             </div>
         {:else}
             <!-- Sidebar -->
-            <div class="{isMobileMenuOpen ? 'flex' : 'hidden'} md:flex shrink-0 flex-col absolute inset-y-0 left-0 md:relative z-50 w-64 bg-blue-950 text-white shadow p-4 h-full border-r border-blue-900 transition-transform duration-300">
+            <div class="{isMobileMenuOpen ? 'flex' : 'hidden'} md:flex shrink-0 flex-col absolute inset-y-0 left-0 md:relative z-50 w-64 bg-blue-950 text-white shadow p-4 border-r border-blue-900 transition-transform duration-300">
                 <h2 class="font-semibold mb-4 text-sm uppercase tracking-wider text-blue-200">Menú</h2>
             <ul class="space-y-2">
                 <li><button on:click={() => { setView('dashboard'); isMobileMenuOpen = false; }} class="w-full text-left px-3 py-2 rounded transition {currentView === 'dashboard' ? 'bg-blue-900 shadow-sm' : 'hover:bg-blue-900'}">Dashboard</button></li>
@@ -164,12 +165,10 @@
         <!-- Contenido -->
         <div class="flex-1 p-4 sm:p-6 lg:p-8 min-w-0 overflow-x-hidden">
             {#if currentView === 'dashboard'}
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">
-                    Bienvenido/a, {studentName}
-                </h2>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                <PageHeader title="Bienvenido/a, {studentName}" />
+                <Card class="mb-8">
                     <p class="text-gray-600">"Inscríbete y expande tu increíble conocimiento."</p>
-                </div>
+                </Card>
 
                 <h3 class="text-2xl font-bold text-gray-800 mb-4">Mis Cursos Actuales</h3>
                 {#if loading}
@@ -181,20 +180,18 @@
                 {:else}
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {#each myCourses as curso}
-                            <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-500 hover:shadow-md transition relative">
-                                <span class="absolute top-4 right-4 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Inscrito</span>
+                            <Card class="border-l-4 border-l-green-500 hover:shadow-md transition relative bg-white">
+                                <Badge color="green" text="Inscrito" class="absolute top-4 right-4" />
                                 <h3 class="text-xl font-bold text-gray-800 mb-2 pr-16">{curso.course_name}</h3>
                                 <p class="text-gray-600 text-sm mb-1"><strong>Código:</strong> {curso.course_code}</p>
                                 <p class="text-gray-600 text-sm mb-1"><strong>Horario:</strong> {curso.schedule}</p>
                                 <p class="text-gray-600 text-sm mt-4 text-green-600 font-medium">Estado: Activo</p>
-                            </div>
+                            </Card>
                         {/each}
                     </div>
                 {/if}
             {:else if currentView === 'cursos'}
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">
-                    Cursos Disponibles
-                </h2>
+                <PageHeader title="Cursos Disponibles" />
                 
                 {#if loading}
                     <p class="text-gray-500">Cargando cursos...</p>
@@ -205,23 +202,23 @@
                 {:else}
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {#each availableCourses as curso}
-                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                            <Card class="hover:shadow-md transition">
                                 <h3 class="text-xl font-bold text-blue-900 mb-2">{curso.course_name}</h3>
                                 <p class="text-gray-600 text-sm mb-1"><strong>Código:</strong> {curso.course_code}</p>
                                 <p class="text-gray-600 text-sm mb-1"><strong>Horario:</strong> {curso.schedule}</p>
                                 <p class="text-gray-600 text-sm mb-4"><strong>Cupos:</strong> {curso.max_capacity}</p>
                                 
                                 {#if myCourses.some(mc => mc.course_id === curso.course_id)}
-                                    <button disabled class="w-full bg-gray-300 text-gray-500 font-medium py-2 rounded-lg cursor-not-allowed">Ya inscrito</button>
+                                    <Button disabled fullWidth={true} class="bg-gray-300 text-gray-500">Ya inscrito</Button>
                                 {:else}
-                                    <button on:click={() => tryEnroll(curso.course_id)} class="w-full bg-blue-900 hover:bg-blue-800 text-white font-medium py-2 rounded-lg transition cursor-pointer">Inscribirme</button>
+                                    <Button on:click={() => tryEnroll(curso.course_id)} variant="primary" fullWidth={true} class="bg-blue-900 hover:bg-blue-800">Inscribirme</Button>
                                 {/if}
-                            </div>
+                            </Card>
                         {/each}
                     </div>
                 {/if}
             {:else if currentView === 'inscripciones'}
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">Historial de Inscripciones</h2>
+                <PageHeader title="Historial de Inscripciones" />
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
                     <DataTable
                         data={myCourses}
@@ -241,13 +238,13 @@
                             <td class="px-6 py-3 text-gray-600">{row.course_name}</td>
                             <td class="px-6 py-3 text-gray-600">{row.schedule}</td>
                             <td class="px-6 py-3 text-center">
-                                <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Activa</span>
+                                <Badge color="green" text="Activa" />
                             </td>
                         </tr>
                     </DataTable>
                 </div>
             {:else if currentView === 'perfil'}
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">Mi Perfil</h2>
+                <PageHeader title="Mi Perfil" />
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-100 max-w-2xl">
                     <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 mb-8">
                         <div class="w-20 h-20 bg-blue-100 text-blue-900 rounded-full flex items-center justify-center text-3xl font-bold uppercase shrink-0">

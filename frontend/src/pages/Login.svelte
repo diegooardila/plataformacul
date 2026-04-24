@@ -1,6 +1,8 @@
 <script lang="ts">
     import { navigate } from "svelte-routing";
     import { login, logout } from "../lib/services/auth";
+    import Input from "../components/ui/Input.svelte";
+    import Button from "../components/ui/Button.svelte";
 
     let username = "";
     let password = "";
@@ -78,18 +80,11 @@
             {/if}
 
             <form class="space-y-5" on:submit|preventDefault={handleLogin}>
-                <div>
-                    <label class="block text-gray-600 text-sm mb-1" for="username">Correo Electrónico</label>
-                    <input id="username" type="text" bind:value={username} required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                </div>
+                <Input id="username" type="text" bind:value={username} required label="Correo Electrónico" />
+                <Input id="password" type="password" bind:value={password} required label="Contraseña" />
 
                 <div>
-                    <label class="block text-gray-600 text-sm mb-1" for="password">Contraseña</label>
-                    <input id="password" type="password" bind:value={password} required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-gray-600 text-sm mb-2">Ingresar Destino</label>
+                    <span class="block text-gray-600 text-sm mb-2 font-medium">Ingresar Destino</span>
                     <div class="grid grid-cols-3 gap-2">
                         <button type="button" class="{selectedRole === 3 ? 'bg-blue-100 text-blue-700 border-blue-500' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'} border rounded-lg py-2 text-sm font-medium transition" on:click={() => selectedRole = 3}>Estudiante</button>
                         <button type="button" class="{selectedRole === 2 ? 'bg-indigo-100 text-indigo-700 border-indigo-500' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'} border rounded-lg py-2 text-sm font-medium transition" on:click={() => selectedRole = 2}>Docente</button>
@@ -98,9 +93,9 @@
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" disabled={isLoading} class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition shadow-sm {isLoading ? 'opacity-70 cursor-not-allowed' : ''}">
+                    <Button type="submit" disabled={isLoading} fullWidth={true}>
                         {isLoading ? 'Verificando...' : 'Ingresar'}
-                    </button>
+                    </Button>
                 </div>
             </form>
         </div>
