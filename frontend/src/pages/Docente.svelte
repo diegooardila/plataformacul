@@ -5,6 +5,7 @@
     import { getEnrollments } from "../lib/services/enrollments";
     import { getUsuarios } from "../lib/services/users";
     import { getSession, logout } from "../lib/services/auth";
+    import DataTable from "../components/DataTable.svelte";
 
     let currentView = 'dashboard';
     let myCourses = [];
@@ -90,6 +91,16 @@
         logout();
         navigate("/");
     }
+
+    $: tableStudentsByCourse = Object.fromEntries(
+        Object.entries(myStudentsByCourse).map(([courseId, students]: [string, any[]]) => [
+            courseId,
+            students.map(st => ({
+                ...st,
+                _nombre: `${st.first_name} ${st.last_name}`.trim(),
+            })),
+        ])
+    );
 </script>
 
 <div class="bg-gray-100 min-h-screen flex flex-col">
@@ -193,31 +204,29 @@
                                         <h3 class="text-lg font-bold text-indigo-900">{curso.course_name} <span class="text-xs font-normal text-indigo-600 bg-white px-2 py-0.5 rounded border border-indigo-200 ml-2">{curso.course_code}</span></h3>
                                         <span class="text-sm font-medium text-indigo-700">{(myStudentsByCourse[curso.course_id] || []).length} inscritos</span>
                                     </div>
-                                    <div class="p-0 overflow-x-auto">
-                                        {#if (myStudentsByCourse[curso.course_id] || []).length === 0}
-                                            <p class="p-6 text-gray-500 text-center text-sm">Este curso aún no tiene inscripciones.</p>
-                                        {:else}
-                                            <table class="w-full text-sm min-w-[600px]">
-                                                <thead class="bg-gray-50 border-b">
-                                                    <tr>
-                                                        <th class="text-left px-6 py-3 text-gray-600 font-semibold">Documento</th>
-                                                        <th class="text-left px-6 py-3 text-gray-600 font-semibold">Nombre Completo</th>
-                                                        <th class="text-center px-6 py-3 text-gray-600 font-semibold">Estado</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody class="divide-y divide-gray-100">
-                                                    {#each (myStudentsByCourse[curso.course_id] || []) as st}
-                                                        <tr class="hover:bg-gray-50 transition">
-                                                            <td class="px-6 py-3 text-gray-800 font-medium">{st.identity_document}</td>
-                                                            <td class="px-6 py-3 text-gray-600">{st.first_name} {st.last_name}</td>
-                                                            <td class="px-6 py-3 text-center">
-                                                                <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-green-100 text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Activo</span>
-                                                            </td>
-                                                        </tr>
-                                                    {/each}
-                                                </tbody>
-                                            </table>
-                                        {/if}
+                                    <div class="p-4">
+                                        <DataTable
+                                            data={tableStudentsByCourse[curso.course_id] || []}
+                                            columns={[
+                                                { key: "identity_document", label: "Documento" },
+                                                { key: "_nombre", label: "Nombre Completo" },
+                                                { key: "_estado", label: "Estado", sortable: false, center: true },
+                                            ]}
+                                            searchPlaceholder="Buscar estudiante..."
+                                            emptyText="Este curso aún no tiene inscripciones"
+                                            tableClass="w-full min-w-[500px]"
+                                            let:row
+                                        >
+                                            <tr class="hover:bg-gray-50 transition">
+                                                <td class="px-6 py-3 text-gray-800 font-medium">{row.identity_document}</td>
+                                                <td class="px-6 py-3 text-gray-600">{row._nombre}</td>
+                                                <td class="px-6 py-3 text-center">
+                                                    <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Activo
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </DataTable>
                                     </div>
                                 </div>
                             {/each}

@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { getCourses, createCourse, updateCourse, deleteCourse, type CourseCreate } from "../lib/services/courses";
     import { getUsuarios } from "../lib/services/users";
+    import DataTable from "./DataTable.svelte";
 
     let courses = [];
     let teachers = [];
@@ -146,6 +147,20 @@
         const t = teachers.find(t => t.user_id === id);
         return t ? `${t.first_name} ${t.last_name}` : "-";
     }
+
+    const courseColumns = [
+        { key: "course_code", label: "Código" },
+        { key: "course_name", label: "Nombre" },
+        { key: "schedule", label: "Horario" },
+        { key: "max_capacity", label: "Cupo" },
+        { key: "_docente", label: "Docente" },
+        { key: "_x", label: "Acciones", sortable: false, center: true },
+    ];
+
+    $: tableCourses = courses.map(c => ({
+        ...c,
+        _docente: getTeacherName(c.teacher_user_id),
+    }));
 </script>
 
 <div class="flex-1">
@@ -169,48 +184,35 @@
     {/if}
 
     <!-- Tabla Cursos -->
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm min-w-[700px]">
-                <thead class="bg-gray-50 border-b">
-                    <tr>
-                        <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Código</th>
-                        <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Nombre</th>
-                        <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Horario</th>
-                        <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Cupo</th>
-                        <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Docente</th>
-                        <th class="text-center px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    {#if loading}
-                        <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">Cargando cursos...</td></tr>
-                    {:else if courses.length === 0}
-                        <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No se encontraron cursos registados.</td></tr>
-                    {:else}
-                        {#each courses as course}
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-4 py-3 font-medium text-gray-800">{course.course_code}</td>
-                                <td class="px-4 py-3 font-medium text-gray-800">{course.course_name}</td>
-                                <td class="px-4 py-3 text-gray-600">{course.schedule}</td>
-                                <td class="px-4 py-3 text-gray-600">{course.max_capacity}</td>
-                                <td class="px-4 py-3 text-gray-600">{getTeacherName(course.teacher_user_id)}</td>
-                                <td class="px-4 py-3">
-                                    <div class="flex justify-center gap-2">
-                                        <button on:click={() => openEditModal(course)} class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Editar">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                        </button>
-                                        <button on:click={() => openDeleteModal(course.course_id)} class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition" title="Eliminar">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        {/each}
-                    {/if}
-                </tbody>
-            </table>
-        </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <DataTable
+            data={tableCourses}
+            columns={courseColumns}
+            {loading}
+            searchPlaceholder="Buscar por código, nombre, docente..."
+            loadingText="Cargando cursos..."
+            emptyText="No se encontraron cursos registrados"
+            tableClass="w-full min-w-[700px]"
+            let:row
+        >
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium text-gray-800">{row.course_code}</td>
+                <td class="px-4 py-3 font-medium text-gray-800">{row.course_name}</td>
+                <td class="px-4 py-3 text-gray-600">{row.schedule}</td>
+                <td class="px-4 py-3 text-gray-600">{row.max_capacity}</td>
+                <td class="px-4 py-3 text-gray-600">{row._docente}</td>
+                <td class="px-4 py-3">
+                    <div class="flex justify-center gap-2">
+                        <button on:click={() => openEditModal(row)} class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Editar">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        </button>
+                        <button on:click={() => openDeleteModal(row.course_id)} class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition" title="Eliminar">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </DataTable>
     </div>
 
     <!-- Modals -->

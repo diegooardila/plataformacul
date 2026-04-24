@@ -3,6 +3,7 @@
     import { getEnrollments, createEnrollment, deleteEnrollment, type EnrollmentCreate } from "../lib/services/enrollments";
     import { getCourses } from "../lib/services/courses";
     import { getUsuarios } from "../lib/services/users";
+    import DataTable from "./DataTable.svelte";
 
     let enrollments = [];
     let students = [];
@@ -143,6 +144,23 @@
         const c = courses.find(c => c.course_id === id);
         return c ? c.course_code : "N/A";
     }
+
+    const enrollmentColumns = [
+        { key: "enrollment_id", label: "ID Insc." },
+        { key: "_estudiante", label: "Estudiante" },
+        { key: "_curso", label: "Curso" },
+        { key: "_codigo", label: "Código" },
+        { key: "_fecha", label: "Fecha" },
+        { key: "_x", label: "Acciones", sortable: false, center: true },
+    ];
+
+    $: tableEnrollments = enrollments.map(en => ({
+        ...en,
+        _estudiante: getStudentName(en.student_user_id),
+        _curso: getCourseName(en.course_id),
+        _codigo: getCourseCode(en.course_id),
+        _fecha: new Date(en.registration_date).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" }),
+    }));
 </script>
 
 <div class="flex-1">
@@ -163,45 +181,32 @@
         </div>
     {/if}
 
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm min-w-[700px]">
-                <thead class="bg-gray-50 border-b">
-                    <tr>
-                        <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">ID Insc.</th>
-                        <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Estudiante</th>
-                        <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Curso</th>
-                        <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Código</th>
-                        <th class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Fecha</th>
-                        <th class="text-center px-4 py-3 text-gray-600 font-semibold whitespace-nowrap">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    {#if loading}
-                        <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">Cargando inscripciones...</td></tr>
-                    {:else if enrollments.length === 0}
-                        <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No se encontraron inscripciones.</td></tr>
-                    {:else}
-                        {#each enrollments as en}
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-4 py-3 font-medium text-gray-800">{en.enrollment_id}</td>
-                                <td class="px-4 py-3 text-gray-600 font-medium">{getStudentName(en.student_user_id)}</td>
-                                <td class="px-4 py-3 text-gray-600">{getCourseName(en.course_id)}</td>
-                                <td class="px-4 py-3 text-gray-600">{getCourseCode(en.course_id)}</td>
-                                <td class="px-4 py-3 text-gray-600 text-center font-medium">{new Date(en.registration_date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
-                                <td class="px-4 py-3">
-                                    <div class="flex justify-center flex-wrap gap-2">
-                                        <button on:click={() => openDeleteModal(en.enrollment_id)} class="text-xs bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1.5 rounded transition font-medium" title="Cancelar inscripción">
-                                            Cancelar
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        {/each}
-                    {/if}
-                </tbody>
-            </table>
-        </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <DataTable
+            data={tableEnrollments}
+            columns={enrollmentColumns}
+            {loading}
+            searchPlaceholder="Buscar por estudiante, curso, código..."
+            loadingText="Cargando inscripciones..."
+            emptyText="No se encontraron inscripciones"
+            tableClass="w-full min-w-[700px]"
+            let:row
+        >
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium text-gray-800">{row.enrollment_id}</td>
+                <td class="px-4 py-3 text-gray-600 font-medium">{row._estudiante}</td>
+                <td class="px-4 py-3 text-gray-600">{row._curso}</td>
+                <td class="px-4 py-3 text-gray-600">{row._codigo}</td>
+                <td class="px-4 py-3 text-gray-600 text-center font-medium">{row._fecha}</td>
+                <td class="px-4 py-3">
+                    <div class="flex justify-center gap-2">
+                        <button on:click={() => openDeleteModal(row.enrollment_id)} class="text-xs bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1.5 rounded transition font-medium" title="Cancelar inscripción">
+                            Cancelar
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </DataTable>
     </div>
 
     <!-- Modal Crear -->

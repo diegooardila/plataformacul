@@ -15,6 +15,7 @@
     import AdminCursos from "../components/AdminCursos.svelte";
     import AdminInscripciones from "../components/AdminInscripciones.svelte";
     import AdminReportes from "../components/AdminReportes.svelte";
+    import DataTable from "../components/DataTable.svelte";
 
     let currentView = "usuarios";
     let isMobileMenuOpen = false;
@@ -34,6 +35,38 @@
 
     let users = [];
     let loading = true;
+
+    const userColumns = [
+        { key: "user_id", label: "ID" },
+        { key: "identity_document", label: "Documento" },
+        { key: "_nombre", label: "Nombre Completo" },
+        { key: "email", label: "Email" },
+        { key: "_rol", label: "Rol" },
+        { key: "_facultad", label: "Facultad" },
+        { key: "_estado", label: "Estado" },
+        { key: "_x", label: "Acciones", sortable: false, center: true },
+    ];
+
+    const userSearchFn = (row: any, q: string): boolean => {
+        const lq = q.toLowerCase();
+        return (
+            String(row.user_id).includes(lq) ||
+            (row.identity_document || "").toLowerCase().includes(lq) ||
+            row._nombre.toLowerCase().includes(lq) ||
+            (row.email || "").toLowerCase().includes(lq) ||
+            row._rol.toLowerCase().includes(lq) ||
+            row._facultad.toLowerCase().includes(lq) ||
+            row._estado.toLowerCase().includes(lq)
+        );
+    };
+
+    $: tableUsers = users.map(u => ({
+        ...u,
+        _nombre: [u.first_name, u.middle_name, u.last_name, u.second_last_name].filter(Boolean).join(" "),
+        _rol: roleMap[String(u.role_id)] || String(u.role_id),
+        _facultad: facultyMap[String(u.faculty_id)] || String(u.faculty_id),
+        _estado: statusMap[String(u.status_id)] || String(u.status_id),
+    }));
     let editingUserId = null;
     let deletingUserId = null;
     let isUserModalOpen = false;
@@ -347,165 +380,54 @@
                 {/if}
 
                 <!-- Tabla de usuarios -->
-                <div
-                    class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100"
-                >
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm min-w-[1000px]">
-                            <thead class="bg-gray-50 border-b">
-                                <tr>
-                                    <th
-                                        class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap"
-                                        >ID</th
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                    <DataTable
+                        data={tableUsers}
+                        columns={userColumns}
+                        {loading}
+                        searchFn={userSearchFn}
+                        searchPlaceholder="Buscar por nombre, email, rol..."
+                        loadingText="Cargando usuarios..."
+                        emptyText="No se encontraron usuarios"
+                        tableClass="w-full min-w-[1000px]"
+                        let:row
+                    >
+                        <tr class="border-b hover:bg-gray-50 transition">
+                            <td class="px-4 py-3 text-gray-700 font-medium">{row.user_id}</td>
+                            <td class="px-4 py-3 text-gray-600">{row.identity_document}</td>
+                            <td class="px-4 py-3 text-gray-600">{row._nombre}</td>
+                            <td class="px-4 py-3 text-gray-600">{row.email}</td>
+                            <td class="px-4 py-3">
+                                <span class="inline-block bg-purple-100 text-purple-700 text-xs font-medium px-2 py-1 rounded-full">{row._rol}</span>
+                            </td>
+                            <td class="px-4 py-3 text-gray-600">{row._facultad}</td>
+                            <td class="px-4 py-3">
+                                <span class="inline-block {statusColorMap[String(row.status_id).trim()] || 'bg-gray-100 text-gray-700'} text-xs font-medium px-2 py-1 rounded-full">{row._estado}</span>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <div class="flex justify-center gap-2">
+                                    <button
+                                        on:click={() => openEditModal(row)}
+                                        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                                        title="Editar"
                                     >
-                                    <th
-                                        class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap"
-                                        >Documento</th
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                    </button>
+                                    <button
+                                        on:click={() => openDeleteModal(row.user_id)}
+                                        class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition"
+                                        title="Eliminar"
                                     >
-                                    <th
-                                        class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap"
-                                        >Nombre Completo</th
-                                    >
-                                    <th
-                                        class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap"
-                                        >Email</th
-                                    >
-                                    <th
-                                        class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap"
-                                        >Rol</th
-                                    >
-                                    <th
-                                        class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap"
-                                        >Facultad</th
-                                    >
-                                    <th
-                                        class="text-left px-4 py-3 text-gray-600 font-semibold whitespace-nowrap"
-                                        >Estado</th
-                                    >
-                                    <th
-                                        class="text-center px-4 py-3 text-gray-600 font-semibold whitespace-nowrap"
-                                        >Acciones</th
-                                    >
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {#if loading}
-                                    <tr
-                                        ><td
-                                            colspan="8"
-                                            class="text-center py-10 text-gray-400"
-                                            >Cargando usuarios...</td
-                                        ></tr
-                                    >
-                                {:else if users.length === 0}
-                                    <tr
-                                        ><td
-                                            colspan="8"
-                                            class="text-center py-10 text-gray-400"
-                                            >No se encontraron usuarios</td
-                                        ></tr
-                                    >
-                                {:else}
-                                    {#each users as u}
-                                        <tr
-                                            class="border-b hover:bg-gray-50 transition"
-                                        >
-                                            <td
-                                                class="px-4 py-3 text-gray-700 font-medium"
-                                                >{u.user_id}</td
-                                            >
-                                            <td class="px-4 py-3 text-gray-600"
-                                                >{u.identity_document}</td
-                                            >
-                                            <td class="px-4 py-3 text-gray-600"
-                                                >{u.first_name}
-                                                {u.middle_name || ""}
-                                                {u.last_name}
-                                                {u.second_last_name || ""}</td
-                                            >
-                                            <td class="px-4 py-3 text-gray-600"
-                                                >{u.email}</td
-                                            >
-                                            <td class="px-4 py-3"
-                                                ><span
-                                                    class="inline-block bg-purple-100 text-purple-700 text-xs font-medium px-2 py-1 rounded-full"
-                                                    >{roleMap[
-                                                        String(u.role_id)
-                                                    ] || u.role_id}</span
-                                                ></td
-                                            >
-                                            <td class="px-4 py-3 text-gray-600"
-                                                >{facultyMap[
-                                                    String(u.faculty_id)
-                                                ] || u.faculty_id}</td
-                                            >
-                                            <td class="px-4 py-3"
-                                                ><span
-                                                    class="inline-block {statusColorMap[
-                                                        String(
-                                                            u.status_id,
-                                                        ).trim()
-                                                    ] ||
-                                                        'bg-gray-100 text-gray-700'} text-xs font-medium px-2 py-1 rounded-full"
-                                                    >{statusMap[
-                                                        String(
-                                                            u.status_id,
-                                                        ).trim()
-                                                    ] || u.status_id}</span
-                                                ></td
-                                            >
-                                            <td class="px-4 py-3 text-center">
-                                                <div
-                                                    class="flex justify-center gap-2"
-                                                >
-                                                    <button
-                                                        on:click={() =>
-                                                            openEditModal(u)}
-                                                        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                                                        title="Editar"
-                                                    >
-                                                        <svg
-                                                            class="w-4 h-4"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                            ><path
-                                                                stroke-linecap="round"
-                                                                stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                                            /></svg
-                                                        >
-                                                    </button>
-                                                    <button
-                                                        on:click={() =>
-                                                            openDeleteModal(
-                                                                u.user_id,
-                                                            )}
-                                                        class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                        title="Eliminar"
-                                                    >
-                                                        <svg
-                                                            class="w-4 h-4"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                            ><path
-                                                                stroke-linecap="round"
-                                                                stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                                            /></svg
-                                                        >
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {/each}
-                                {/if}
-                            </tbody>
-                        </table>
-                    </div>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </DataTable>
                 </div>
 
                 <!-- Modal Crear/Editar -->

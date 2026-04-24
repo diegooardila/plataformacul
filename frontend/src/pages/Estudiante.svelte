@@ -5,6 +5,7 @@
     import { getCourses } from "../lib/services/courses";
     import { createEnrollment, getEnrollments } from "../lib/services/enrollments";
     import { getSession, logout } from "../lib/services/auth";
+    import DataTable from "../components/DataTable.svelte";
 
     let currentView = 'dashboard';
     let availableCourses = [];
@@ -221,36 +222,30 @@
                 {/if}
             {:else if currentView === 'inscripciones'}
                 <h2 class="text-3xl font-bold text-gray-800 mb-6">Historial de Inscripciones</h2>
-                {#if myCourses.length === 0}
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <p class="text-gray-600">Aún no tienes inscripciones activas.</p>
-                    </div>
-                {:else}
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
-                        <table class="w-full text-sm min-w-[600px]">
-                            <thead class="bg-gray-50 border-b">
-                                <tr>
-                                    <th class="text-left px-6 py-3 text-gray-600 font-semibold">Código</th>
-                                    <th class="text-left px-6 py-3 text-gray-600 font-semibold">Curso</th>
-                                    <th class="text-left px-6 py-3 text-gray-600 font-semibold">Horario</th>
-                                    <th class="text-center px-6 py-3 text-gray-600 font-semibold">Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                {#each myCourses as curso}
-                                    <tr class="hover:bg-gray-50 transition">
-                                        <td class="px-6 py-3 font-medium text-gray-800">{curso.course_code}</td>
-                                        <td class="px-6 py-3 text-gray-600">{curso.course_name}</td>
-                                        <td class="px-6 py-3 text-gray-600">{curso.schedule}</td>
-                                        <td class="px-6 py-3 text-center">
-                                            <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Activa</span>
-                                        </td>
-                                    </tr>
-                                {/each}
-                            </tbody>
-                        </table>
-                    </div>
-                {/if}
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                    <DataTable
+                        data={myCourses}
+                        columns={[
+                            { key: "course_code", label: "Código" },
+                            { key: "course_name", label: "Curso" },
+                            { key: "schedule", label: "Horario" },
+                            { key: "_estado", label: "Estado", sortable: false, center: true },
+                        ]}
+                        searchPlaceholder="Buscar por código, nombre, horario..."
+                        emptyText="Aún no tienes inscripciones activas"
+                        tableClass="w-full min-w-[500px]"
+                        let:row
+                    >
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-3 font-medium text-gray-800">{row.course_code}</td>
+                            <td class="px-6 py-3 text-gray-600">{row.course_name}</td>
+                            <td class="px-6 py-3 text-gray-600">{row.schedule}</td>
+                            <td class="px-6 py-3 text-center">
+                                <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Activa</span>
+                            </td>
+                        </tr>
+                    </DataTable>
+                </div>
             {:else if currentView === 'perfil'}
                 <h2 class="text-3xl font-bold text-gray-800 mb-6">Mi Perfil</h2>
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-100 max-w-2xl">
