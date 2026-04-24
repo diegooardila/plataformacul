@@ -3,13 +3,7 @@ import smtplib
 import threading
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
-SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USER = os.getenv("SMTP_USER", "")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
-SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "Plataforma CUL")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "")
+from email.header import Header
 
 _BASE_STYLE = """
     body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 0; }
@@ -54,21 +48,27 @@ def _build_email(subject: str, body_html: str) -> str:
 
 
 def _send(to_email: str, subject: str, html: str):
-    if not SMTP_USER or not SMTP_PASSWORD:
+    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+    smtp_user = os.getenv("SMTP_USER", "")
+    smtp_password = os.getenv("SMTP_PASSWORD", "")
+    from_name = os.getenv("SMTP_FROM_NAME", "Plataforma CUL")
+
+    if not smtp_user or not smtp_password:
         print(f"[Email] SMTP no configurado — omitiendo notificación a {to_email}")
         return
     try:
         msg = MIMEMultipart("alternative")
-        msg["Subject"] = subject
-        msg["From"] = f"{SMTP_FROM_NAME} <{SMTP_USER}>"
+        msg["Subject"] = Header(subject, "utf-8")
+        msg["From"] = f"{from_name} <{smtp_user}>"
         msg["To"] = to_email
         msg.attach(MIMEText(html, "html", "utf-8"))
 
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
             server.ehlo()
             server.starttls()
-            server.login(SMTP_USER, SMTP_PASSWORD)
-            server.sendmail(SMTP_USER, [to_email], msg.as_string())
+            server.login(smtp_user, smtp_password)
+            server.sendmail(smtp_user, [to_email], msg.as_string())
         print(f"[Email] Enviado a {to_email} | {subject}")
     except Exception as exc:
         print(f"[Email] Error al enviar a {to_email}: {exc}")

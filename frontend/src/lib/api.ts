@@ -26,7 +26,12 @@ export async function apiFetch<T>(
     });
 
     if (!res.ok) {
-        throw new Error(`HTTP error: ${res.status}`);
+        let detail = `Error ${res.status}`;
+        try {
+            const errBody = await res.json();
+            if (errBody.detail) detail = errBody.detail;
+        } catch {}
+        throw new Error(detail);
     }
 
     return res.json();

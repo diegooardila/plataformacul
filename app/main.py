@@ -1,4 +1,6 @@
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 from routes.academic_periods_routes import router as academic_periods_router
 from routes.auth_routes import router as auth_router

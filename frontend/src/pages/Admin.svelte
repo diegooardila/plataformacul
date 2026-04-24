@@ -204,9 +204,10 @@
         toastMessage = message;
         toastType = type;
         showToast = true;
+        const duration = type === "error" ? 6000 : 3000;
         setTimeout(() => {
             showToast = false;
-        }, 3000);
+        }, duration);
     }
 
     async function saveUser() {
@@ -260,9 +261,10 @@
             closeDeleteModal();
             displayToast("Usuario eliminado correctamente", "success");
             loadUsers();
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            displayToast("Error al eliminar el usuario", "error");
+            const msg = err?.message || "Error al eliminar el usuario";
+            displayToast(msg, "error");
             closeDeleteModal();
         }
     }

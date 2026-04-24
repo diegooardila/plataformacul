@@ -3,15 +3,40 @@ from fastapi import HTTPException
 from config.db_config import get_db_connection
 from models.grades_model import Grade
 from fastapi.encoders import jsonable_encoder
+from services.email_service import notify_grade_registered, notify_grade_updated
 
 class GradeController:
         
-    def create_grade(self, grade: Grade):   
+    def _get_student_and_course(self, cursor, enrollment_id: int):
+        cursor.execute(
+            """
+            SELECT u.first_name, u.last_name, u.email, c.course_name
+            FROM enrollments e
+            JOIN users u ON u.user_id = e.student_user_id
+            JOIN courses c ON c.course_id = e.course_id
+            WHERE e.enrollment_id = %s
+            """,
+            (enrollment_id,),
+        )
+        return cursor.fetchone()
+
+    def create_grade(self, grade: Grade):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO grades (enrollment_id, final_grade, observations) VALUES (%s, %s, %s)", (grade.enrollment_id, grade.final_grade, grade.observations))
+            cursor.execute(
+                "INSERT INTO grades (enrollment_id, final_grade, observations) VALUES (%s, %s, %s)",
+                (grade.enrollment_id, grade.final_grade, grade.observations),
+            )
             conn.commit()
+
+            row = self._get_student_and_course(cursor, grade.enrollment_id)
+            if row:
+                notify_grade_registered(
+                    f"{row[0]} {row[1]}", row[2], row[3],
+                    float(grade.final_grade), grade.observations,
+                )
+
             conn.close()
             return {"resultado": "Grade created"}
         except psycopg2.Error as err:
@@ -97,6 +122,14 @@ class GradeController:
                 id_grade
             ))
             conn.commit()
+
+            row = self._get_student_and_course(cursor, grade.enrollment_id)
+            if row:
+                notify_grade_updated(
+                    f"{row[0]} {row[1]}", row[2], row[3],
+                    float(grade.final_grade), grade.observations,
+                )
+
             return {"resultado": "Grade updated"}
         except psycopg2.Error as err:
             print(err)

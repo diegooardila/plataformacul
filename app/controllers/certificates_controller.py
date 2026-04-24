@@ -3,15 +3,38 @@ from fastapi import HTTPException
 from config.db_config import get_db_connection
 from models.certificates_model import Certificate
 from fastapi.encoders import jsonable_encoder
+from services.email_service import notify_certificate_created
 
 class CertificateController:
         
-    def create_certificate(self, certificate: Certificate):   
+    def create_certificate(self, certificate: Certificate):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO certificates (enrollment_id, verification_code, issue_date) VALUES (%s, %s, %s)", (certificate.enrollment_id, certificate.verification_code, certificate.issue_date))
+            cursor.execute(
+                "INSERT INTO certificates (enrollment_id, verification_code, issue_date) VALUES (%s, %s, %s)",
+                (certificate.enrollment_id, certificate.verification_code, certificate.issue_date),
+            )
             conn.commit()
+
+            cursor.execute(
+                """
+                SELECT u.first_name, u.last_name, u.email, c.course_name
+                FROM enrollments e
+                JOIN users u ON u.user_id = e.student_user_id
+                JOIN courses c ON c.course_id = e.course_id
+                WHERE e.enrollment_id = %s
+                """,
+                (certificate.enrollment_id,),
+            )
+            row = cursor.fetchone()
+            if row:
+                issue_str = str(certificate.issue_date)[:10] if certificate.issue_date else ""
+                notify_certificate_created(
+                    f"{row[0]} {row[1]}", row[2], row[3],
+                    certificate.verification_code, issue_str,
+                )
+
             conn.close()
             return {"resultado": "certificate created"}
         except psycopg2.Error as err:

@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from config.db_config import get_db_connection
 from models.users_model import User
 from fastapi.encoders import jsonable_encoder
+from services.email_service import notify_user_created, notify_user_deleted
 
 class UserController:
         
@@ -13,6 +14,8 @@ class UserController:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO users (identity_document, first_name, middle_name, last_name, second_last_name, email, password_hash, role_id, faculty_id, status_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (usuario.identity_document, usuario.first_name, usuario.middle_name, usuario.last_name, usuario.second_last_name, usuario.email, usuario.password_hash, usuario.role_id, usuario.faculty_id, usuario.status_id))
             conn.commit()
+            full_name = f"{usuario.first_name} {usuario.last_name}"
+            notify_user_created(full_name, usuario.email, str(usuario.role_id))
             return {"resultado": "User created"}
         except psycopg2.Error as err:
             print(err)
@@ -144,17 +147,55 @@ class UserController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
+
+            cursor.execute(
+                "SELECT first_name, last_name, email FROM users WHERE user_id = %s",
+                (id_user,),
+            )
+            user_row = cursor.fetchone()
+            if user_row is None:
+                raise HTTPException(status_code=404, detail="Usuario no encontrado.")
+
+            # Eliminar en cascada respetando el orden de FK:
+            # grades y certificates dependen de enrollments, que depende de users
+            cursor.execute(
+                """DELETE FROM grades
+                   WHERE enrollment_id IN (
+                       SELECT enrollment_id FROM enrollments WHERE student_user_id = %s
+                   )""",
+                (id_user,),
+            )
+            cursor.execute(
+                """DELETE FROM certificates
+                   WHERE enrollment_id IN (
+                       SELECT enrollment_id FROM enrollments WHERE student_user_id = %s
+                   )""",
+                (id_user,),
+            )
+            cursor.execute(
+                "DELETE FROM enrollments WHERE student_user_id = %s", (id_user,)
+            )
             cursor.execute("DELETE FROM users WHERE user_id = %s", (id_user,))
             conn.commit()
+
+            import os
+            full_name = f"{user_row[0]} {user_row[1]}"
+            notify_user_deleted(full_name, user_row[2], os.getenv("ADMIN_EMAIL", ""))
+
             return {"resultado": "User deleted"}
+        except HTTPException:
+            raise
         except psycopg2.Error as err:
             print(err)
             if conn:
                 conn.rollback()
             error_msg = str(err).lower()
-            if "foreign key constraint" in error_msg:
-                raise HTTPException(status_code=400, detail="No se puede eliminar: el usuario tiene registros asociados (inscripciones, notas, etc). Cambie su estado a Inactivo.")
-            raise HTTPException(status_code=500, detail="Error interno de la base de datos al eliminar.")
+            if "fk_course_teacher" in error_msg or "teacher_user_id" in error_msg:
+                raise HTTPException(
+                    status_code=400,
+                    detail="No se puede eliminar: este usuario es docente de uno o más cursos activos. Reasigne los cursos primero.",
+                )
+            raise HTTPException(status_code=500, detail="Error interno al eliminar el usuario.")
         finally:
             if conn:
                 conn.close()

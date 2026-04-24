@@ -3,15 +3,34 @@ from fastapi import HTTPException
 from config.db_config import get_db_connection
 from models.enrollments_model import Enrollment
 from fastapi.encoders import jsonable_encoder
+from services.email_service import notify_enrollment_created, notify_enrollment_updated
 
 class EnrollmentController:
         
-    def create_enrollment(self, enrollment: Enrollment):   
+    def create_enrollment(self, enrollment: Enrollment):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO enrollments (student_user_id,course_id,registration_date,status_id) VALUES (%s, %s, %s, %s)", (enrollment.student_user_id, enrollment.course_id, enrollment.registration_date, enrollment.status_id))
+            cursor.execute(
+                "INSERT INTO enrollments (student_user_id,course_id,registration_date,status_id) VALUES (%s, %s, %s, %s)",
+                (enrollment.student_user_id, enrollment.course_id, enrollment.registration_date, enrollment.status_id),
+            )
             conn.commit()
+
+            cursor.execute(
+                """
+                SELECT u.first_name, u.last_name, u.email, c.course_name
+                FROM users u
+                JOIN courses c ON c.course_id = %s
+                WHERE u.user_id = %s
+                """,
+                (enrollment.course_id, enrollment.student_user_id),
+            )
+            row = cursor.fetchone()
+            if row:
+                reg_str = str(enrollment.registration_date)[:10] if enrollment.registration_date else ""
+                notify_enrollment_created(f"{row[0]} {row[1]}", row[2], row[3], reg_str)
+
             conn.close()
             return {"resultado": "Enrollment created"}
         except psycopg2.Error as err:
@@ -103,6 +122,21 @@ class EnrollmentController:
                 enrollment_id
             ))
             conn.commit()
+
+            cursor.execute(
+                """
+                SELECT u.first_name, u.last_name, u.email, c.course_name, s.status_name
+                FROM users u
+                JOIN courses c ON c.course_id = %s
+                JOIN statuses s ON s.status_id = %s
+                WHERE u.user_id = %s
+                """,
+                (enrollment.course_id, enrollment.status_id, enrollment.student_user_id),
+            )
+            row = cursor.fetchone()
+            if row:
+                notify_enrollment_updated(f"{row[0]} {row[1]}", row[2], row[3], row[4])
+
             return {"resultado": "Enrollment updated"}
         except psycopg2.Error as err:
             print(err)
