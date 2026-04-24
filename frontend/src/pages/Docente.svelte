@@ -274,7 +274,7 @@
             </div>
 
             <!-- Contenido -->
-            <div class="flex-1 p-4 sm:p-6 lg:p-8 min-w-0 overflow-x-hidden">
+            <div class="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
                 {#if loading}
                     <div class="flex h-full items-center justify-center">
                         <p class="text-gray-500 font-medium">
