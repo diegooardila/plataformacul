@@ -22,6 +22,7 @@ export async function apiFetch<T>(
     const res = await fetch(endpoint, {
         ...rest,
         headers,
+        credentials: 'include',
         body: body ? JSON.stringify(body) : undefined
     });
 

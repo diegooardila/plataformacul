@@ -21,7 +21,7 @@
 
         try {
             const res = await login(username, password, selectedRole);
-            const user = res.resultado.user;
+            const user = res.user;
             
             // Validar si el rol que el usuario escogió en la interfaz coincide exactamente con su rol en la BD
             let allowed = false;
