@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { fly, fade } from "svelte/transition";
+    import { cubicOut } from "svelte/easing";
     import { navigate } from "svelte-routing";
     import { login, logout } from "../lib/services/auth";
     import Input from "../components/ui/Input.svelte";
@@ -54,7 +56,10 @@
 </script>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-100 via-blue-50 to-gray-200 flex items-center justify-center p-4">
-    <div class="bg-white shadow-xl rounded-xl overflow-hidden flex flex-col md:flex-row w-full max-w-5xl">
+    <div
+        class="bg-white shadow-xl rounded-xl overflow-hidden flex flex-col md:flex-row w-full max-w-5xl"
+        in:fly={{ y: 18, duration: 380, easing: cubicOut }}
+    >
 
         <!-- Panel izquierdo -->
         <div class="md:w-1/2 bg-gray-50 flex flex-col justify-center items-center p-10 text-center">
@@ -74,7 +79,10 @@
             </h2>
 
             {#if errorMessage}
-                <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 border border-red-100 text-center">
+                <div
+                    class="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 border border-red-100 text-center"
+                    transition:fade={{ duration: 180 }}
+                >
                     {errorMessage}
                 </div>
             {/if}

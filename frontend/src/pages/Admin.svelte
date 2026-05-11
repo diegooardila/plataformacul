@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { fade } from "svelte/transition";
     import { navigate } from "svelte-routing";
     import { getSession, logout } from "../lib/services/auth";
 
@@ -91,15 +92,19 @@
 
         <!-- Main Content -->
         <main class="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
-            {#if currentView === "usuarios"}
-                <AdminUsuarios />
-            {:else if currentView === "cursos"}
-                <AdminCursos />
-            {:else if currentView === "inscripciones"}
-                <AdminInscripciones />
-            {:else if currentView === "reportes"}
-                <AdminReportes />
-            {/if}
+            {#key currentView}
+                <div in:fade={{ duration: 180 }}>
+                    {#if currentView === "usuarios"}
+                        <AdminUsuarios />
+                    {:else if currentView === "cursos"}
+                        <AdminCursos />
+                    {:else if currentView === "inscripciones"}
+                        <AdminInscripciones />
+                    {:else if currentView === "reportes"}
+                        <AdminReportes />
+                    {/if}
+                </div>
+            {/key}
         </main>
     </div>
 </div>

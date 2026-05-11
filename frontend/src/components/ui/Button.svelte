@@ -4,7 +4,7 @@
     export let disabled = false;
     export let fullWidth = false;
 
-    let baseClass = "font-medium py-2 px-4 rounded-lg transition shadow-sm cursor-pointer border-0 flex justify-center items-center gap-2";
+    let baseClass = "font-medium py-2 px-4 rounded-lg transition shadow-sm cursor-pointer border-0 flex justify-center items-center gap-2 active:scale-95";
     
     $: variantClass = {
         primary: "bg-blue-600 hover:bg-blue-700 text-white",

@@ -1,13 +1,20 @@
 <script>
+    import { fade, fly } from "svelte/transition";
+    import { cubicOut } from "svelte/easing";
+
     export let title;
     export let isOpen = false;
     export let maxWidth = "max-w-2xl";
 </script>
 
 {#if isOpen}
-<div class="fixed inset-0 z-40 flex items-center justify-center p-4">
+<div class="fixed inset-0 z-40 flex items-center justify-center p-4" transition:fade={{ duration: 150 }}>
     <button class="absolute inset-0 bg-black/50 border-0 outline-none" on:click={() => isOpen = false} aria-label="Cerrar modal"></button>
-    <div class="relative bg-white rounded-xl shadow-2xl w-full {maxWidth} max-h-[90vh] overflow-y-auto">
+    <div
+        class="relative bg-white rounded-xl shadow-2xl w-full {maxWidth} max-h-[90vh] overflow-y-auto"
+        in:fly={{ y: 14, duration: 220, easing: cubicOut }}
+        out:fade={{ duration: 120 }}
+    >
         <div class="flex justify-between items-center px-6 py-4 border-b">
             <h3 class="text-lg font-bold text-gray-800">{title}</h3>
             <button on:click={() => isOpen = false} class="text-gray-400 hover:text-gray-600 cursor-pointer p-1 rounded-full hover:bg-gray-100 transition">
