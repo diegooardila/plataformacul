@@ -48,6 +48,8 @@
         "8": "Comunicación Social",
         "9": "Biología",
         "10": "Matemáticas",
+        "null": "N/A",
+        "": "N/A"
     };
 
     const roleMap = {
@@ -328,7 +330,8 @@
                     {value: 2, label: 'Docente'},
                     {value: 3, label: 'Estudiante'}
                 ]} />
-                <Select id="fac_id" required bind:value={form.faculty_id} label="Facultad" options={[
+                <Select id="fac_id" bind:value={form.faculty_id} label="Facultad" options={[
+                    {value: '', label: 'N/A'},
                     {value: 1, label: 'Ingeniería de Sistemas'},
                     {value: 2, label: 'Medicina'},
                     {value: 3, label: 'Derecho'},

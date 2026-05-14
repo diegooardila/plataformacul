@@ -11,6 +11,26 @@ class EnrollmentController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
+
+            # Verify capacity
+            cursor.execute(
+                """
+                SELECT c.max_capacity, COUNT(e.enrollment_id)
+                FROM courses c
+                LEFT JOIN enrollments e ON c.course_id = e.course_id AND e.status_id = 1
+                WHERE c.course_id = %s
+                GROUP BY c.max_capacity
+                """,
+                (enrollment.course_id,)
+            )
+            row = cursor.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="El curso no existe")
+            
+            max_cap, curr_enrolled = row
+            if curr_enrolled >= max_cap:
+                raise HTTPException(status_code=400, detail="El curso ha alcanzado su capacidad máxima")
+
             cursor.execute(
                 "INSERT INTO enrollments (student_user_id,course_id,registration_date,status_id) VALUES (%s, %s, %s, %s)",
                 (enrollment.student_user_id, enrollment.course_id, enrollment.registration_date, enrollment.status_id),

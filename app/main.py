@@ -21,6 +21,24 @@ from fastapi.responses import FileResponse
 
 app = FastAPI()
 
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+import traceback
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    with open("fastapi_err.log", "a") as errf:
+        errf.write("Exception:\n")
+        errf.write(traceback.format_exc() + "\n")
+    return JSONResponse(status_code=500, content={"detail": str(exc)})
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    with open("fastapi_err.log", "a") as errf:
+        errf.write(f"Validation Error: {str(exc.errors())}\nBody: {exc.body}\n")
+    return JSONResponse(status_code=422, content={"detail": str(exc.errors())})
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

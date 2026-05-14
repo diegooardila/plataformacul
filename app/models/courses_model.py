@@ -7,7 +7,7 @@ class Courses(BaseModel):
     max_capacity: int
     schedule : str
     teacher_user_id: int
-    clasroom: str
+    clasroom: int
     period_id: int
     status: int
     created_at: str | None = None

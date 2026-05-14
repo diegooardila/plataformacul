@@ -38,7 +38,7 @@
                 getCourses(),
                 getUsuarios()
             ]);
-            courses = coursesData || [];
+            courses = (coursesData || []).sort((a, b) => a.course_id - b.course_id);
             teachers = (usersData || []).filter(u => u.role_id === 2); // Role 2 = Docente
         } catch (err) {
             console.error(err);

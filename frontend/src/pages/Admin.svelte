@@ -9,9 +9,32 @@
     import AdminInscripciones from "../components/AdminInscripciones.svelte";
     import AdminReportes from "../components/AdminReportes.svelte";
     import Button from "../components/ui/Button.svelte";
+    import PageHeader from "../components/ui/PageHeader.svelte";
+    import Badge from "../components/ui/Badge.svelte";
 
     let currentView = "usuarios";
     let isMobileMenuOpen = false;
+
+    let adminId = null;
+    let adminName = "Administrador";
+    let profilePicUrl = null;
+
+    function handlePhotoUpload(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                profilePicUrl = event.target.result as string;
+                if (adminId) localStorage.setItem(`profile_pic_${adminId}`, profilePicUrl);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function removePhoto() {
+        profilePicUrl = null;
+        if (adminId) localStorage.removeItem(`profile_pic_${adminId}`);
+    }
 
     function toggleMobileMenu() {
         isMobileMenuOpen = !isMobileMenuOpen;
@@ -21,7 +44,12 @@
         const session = getSession();
         if (!session.user_id || session.role_id !== 1) {
             navigate("/");
+            return;
         }
+        adminId = session.user_id;
+        adminName = session.user_name || "Administrador";
+        const savedPic = localStorage.getItem(`profile_pic_${adminId}`);
+        if (savedPic) profilePicUrl = savedPic;
     });
 
     function cerrarSesion() {
@@ -87,6 +115,12 @@
                         class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'reportes' ? 'bg-blue-600 text-white shadow' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
                         >Reportes</button>
                 </li>
+                <li>
+                    <button
+                        on:click={() => { currentView = "perfil"; isMobileMenuOpen = false; }}
+                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'perfil' ? 'bg-blue-600 text-white shadow' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
+                        >Perfil</button>
+                </li>
             </ul>
         </aside>
 
@@ -102,6 +136,47 @@
                         <AdminInscripciones />
                     {:else if currentView === "reportes"}
                         <AdminReportes />
+                    {:else if currentView === "perfil"}
+                        <PageHeader title="Mi Perfil" />
+                        <div class="max-w-2xl bg-white rounded-xl shadow-sm border border-gray-100 p-8 flex flex-col items-center sm:flex-row sm:items-start gap-8">
+                            <div class="flex flex-col items-center shrink-0">
+                                <div class="w-32 h-32 rounded-full bg-blue-50 border-4 border-white shadow-lg overflow-hidden flex items-center justify-center mb-4 relative group">
+                                    {#if profilePicUrl}
+                                        <img src={profilePicUrl} alt="Foto de perfil" class="w-full h-full object-cover" />
+                                    {:else}
+                                        <svg class="w-16 h-16 text-blue-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                    {/if}
+                                    <label class="absolute inset-0 bg-black/40 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                        <span class="text-xs font-semibold">Cambiar</span>
+                                        <input type="file" accept="image/*" class="hidden" on:change={handlePhotoUpload} />
+                                    </label>
+                                </div>
+                                {#if profilePicUrl}
+                                    <button on:click={removePhoto} class="mt-2 text-xs font-medium text-red-500 hover:text-red-700 transition">Quitar foto</button>
+                                {/if}
+                            </div>
+                            <div class="flex-1 w-full space-y-4">
+                                <div>
+                                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nombre Completo</h3>
+                                    <p class="text-xl font-bold text-gray-800">{adminName}</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Rol y Estado</h3>
+                                    <div class="inline-flex items-center mt-1 gap-2">
+                                        <span class="relative flex h-3 w-3">
+                                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                        </span>
+                                        <Badge color="green" text="Activo" />
+                                        <Badge color="blue" text="Administrador" />
+                                    </div>
+                                </div>
+                                <div class="pt-4 border-t border-gray-100">
+                                    <p class="text-sm text-gray-500">Puedes hacer clic en el avatar para actualizar tu imagen de perfil en forma local.</p>
+                                </div>
+                            </div>
+                        </div>
                     {/if}
                 </div>
             {/key}

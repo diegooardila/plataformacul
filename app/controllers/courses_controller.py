@@ -10,9 +10,16 @@ class CoursesController:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO curso (codigo_curso,nombre_curso,cupo_maximo,fecha_hora,id_docente,id_aula,id_periodo,id_estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (course.course_code, course.course_name, course.max_capacity, course.schedule, course.teacher_user_id, course.clasroom, course.period_id, course.status))
+            cursor.execute("""
+                INSERT INTO courses (
+                    course_code, course_name, max_capacity, schedule, teacher_user_id, classroom_id, period_id, status_id
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                course.course_code, course.course_name, course.max_capacity, 
+                course.schedule, course.teacher_user_id, course.clasroom, 
+                course.period_id, course.status
+            ))
             conn.commit()
-            conn.close()
             return {"resultado": "Course created"}
         except psycopg2.Error as err:
             print(err)
@@ -103,9 +110,9 @@ class CoursesController:
                     max_capacity = %s,
                     schedule = %s,
                     teacher_user_id = %s,
-                    clasroom = %s,
+                    classroom_id = %s,
                     period_id = %s,
-                    status = %s
+                    status_id = %s
                 WHERE course_id = %s
             """, (
                 course.course_code,

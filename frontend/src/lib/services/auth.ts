@@ -42,11 +42,15 @@ export const logout = async () => {
 };
 
 export const getSession = () => {
+    const uId = localStorage.getItem('user_id');
+    const rId = localStorage.getItem('role_id');
+    const sId = localStorage.getItem('status_id');
+    
     return {
         token: localStorage.getItem('token'),
-        user_id: localStorage.getItem('user_id') ? parseInt(localStorage.getItem('user_id') as any) : null,
-        role_id: localStorage.getItem('role_id') ? parseInt(localStorage.getItem('role_id') as any) : null,
-        status_id: localStorage.getItem('status_id') ? parseInt(localStorage.getItem('status_id') as any) : null,
+        user_id: (uId && uId !== 'null' && uId !== 'undefined') ? parseInt(uId) : null,
+        role_id: (rId && rId !== 'null' && rId !== 'undefined') ? parseInt(rId) : null,
+        status_id: (sId && sId !== 'null' && sId !== 'undefined') ? parseInt(sId) : 1,
         user_name: localStorage.getItem('user_name') || ''
     };
 };

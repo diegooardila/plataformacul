@@ -113,7 +113,7 @@
             await loadData();
         } catch (err) {
             console.error(err);
-            displayToast("Error al procesar la inscripción", "error");
+            displayToast(err.message || "Error al procesar la inscripción", "error");
         }
     }
 
