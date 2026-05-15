@@ -92,7 +92,10 @@ def notify_user_created(full_name: str, user_email: str, role: str):
         <p>Ya puedes iniciar sesión con tu documento de identidad y la contraseña asignada por el administrador.</p>
         <p>Si tienes alguna duda, comunícate con el área académica.</p>
     """
-    _send_async("jbellosolano@gmail.com", subject, _build_email(subject, body))
+    html = _build_email(subject, body)
+    _send_async(user_email, subject, html)
+    if user_email != "jbellosolano@gmail.com":
+        _send_async("jbellosolano@gmail.com", subject, html)
 
 
 def notify_user_deleted(full_name: str, user_email: str, admin_email: str):
@@ -103,7 +106,10 @@ def notify_user_deleted(full_name: str, user_email: str, admin_email: str):
         <p>Te informamos que tu cuenta en la Plataforma CUL ha sido <span class="badge badge-danger">Eliminada</span>.</p>
         <p>Si crees que esto es un error, comunícate con el administrador del sistema.</p>
     """
-    _send_async("jbellosolano@gmail.com", subject_user, _build_email(subject_user, body_user))
+    html_user = _build_email(subject_user, body_user)
+    _send_async(user_email, subject_user, html_user)
+    if user_email != "jbellosolano@gmail.com":
+        _send_async("jbellosolano@gmail.com", subject_user, html_user)
 
     if admin_email:
         subject_admin = f"Usuario eliminado: {full_name}"

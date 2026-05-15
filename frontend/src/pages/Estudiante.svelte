@@ -1,5 +1,6 @@
 <script>
     import { onMount } from "svelte";
+    import { fly } from "svelte/transition";
     import { navigate } from "svelte-routing";
 
     import DataTable from "../components/DataTable.svelte";
@@ -179,6 +180,17 @@
                     /></svg
                 >
             </button>
+            <svg
+                class="w-6 h-6 hidden sm:block"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+            /></svg>
             <h1 class="text-lg font-bold">Panel del Estudiante</h1>
         </div>
         <Button
@@ -249,75 +261,74 @@
                 >
                     Menú
                 </h2>
-                <ul class="space-y-2">
+                <ul class="space-y-1">
                     <li>
                         <button
-                            on:click={() => {
-                                setView("dashboard");
-                                isMobileMenuOpen = false;
-                            }}
-                            class="w-full text-left px-3 py-2 rounded transition {currentView ===
-                            'dashboard'
-                                ? 'bg-blue-900 shadow-sm'
-                                : 'hover:bg-blue-900'}">Dashboard</button
+                            on:click={() => { setView("dashboard"); isMobileMenuOpen = false; }}
+                            class="w-full text-left px-3 py-2.5 rounded-lg transition-all flex items-center gap-2.5 text-sm {currentView === 'dashboard' ? 'bg-blue-900 shadow-sm border-l-2 border-l-blue-300 font-semibold' : 'hover:bg-blue-900/60 text-blue-100'}"
                         >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            Dashboard
+                        </button>
                     </li>
                     <li>
                         <button
-                            on:click={() => {
-                                setView("cursos");
-                                isMobileMenuOpen = false;
-                            }}
-                            class="w-full text-left px-3 py-2 rounded transition {currentView ===
-                            'cursos'
-                                ? 'bg-blue-900 shadow-sm'
-                                : 'hover:bg-blue-900'}"
-                            >Cursos disponibles</button
+                            on:click={() => { setView("cursos"); isMobileMenuOpen = false; }}
+                            class="w-full text-left px-3 py-2.5 rounded-lg transition-all flex items-center gap-2.5 text-sm {currentView === 'cursos' ? 'bg-blue-900 shadow-sm border-l-2 border-l-blue-300 font-semibold' : 'hover:bg-blue-900/60 text-blue-100'}"
                         >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                            Cursos disponibles
+                        </button>
                     </li>
                     <li>
                         <button
-                            on:click={() => {
-                                setView("inscripciones");
-                                isMobileMenuOpen = false;
-                            }}
-                            class="w-full text-left px-3 py-2 rounded transition {currentView ===
-                            'inscripciones'
-                                ? 'bg-blue-900 shadow-sm'
-                                : 'hover:bg-blue-900'}"
-                            >Mis inscripciones</button
+                            on:click={() => { setView("inscripciones"); isMobileMenuOpen = false; }}
+                            class="w-full text-left px-3 py-2.5 rounded-lg transition-all flex items-center gap-2.5 text-sm {currentView === 'inscripciones' ? 'bg-blue-900 shadow-sm border-l-2 border-l-blue-300 font-semibold' : 'hover:bg-blue-900/60 text-blue-100'}"
                         >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                            Mis inscripciones
+                        </button>
                     </li>
                     <li>
                         <button
-                            on:click={() => {
-                                setView("perfil");
-                                isMobileMenuOpen = false;
-                            }}
-                            class="w-full text-left px-3 py-2 rounded transition {currentView ===
-                            'perfil'
-                                ? 'bg-blue-900 shadow-sm'
-                                : 'hover:bg-blue-900'}">Perfil</button
+                            on:click={() => { setView("perfil"); isMobileMenuOpen = false; }}
+                            class="w-full text-left px-3 py-2.5 rounded-lg transition-all flex items-center gap-2.5 text-sm {currentView === 'perfil' ? 'bg-blue-900 shadow-sm border-l-2 border-l-blue-300 font-semibold' : 'hover:bg-blue-900/60 text-blue-100'}"
                         >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            Perfil
+                        </button>
                     </li>
                 </ul>
             </div>
 
             <!-- Contenido -->
             <div class="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
+                {#key currentView}
+                <div in:fly={{ y: 10, duration: 220 }}>
                 {#if currentView === "dashboard"}
                     <PageHeader title="Bienvenido/a, {studentName}" />
                     <Card class="mb-8">
-                        <p class="text-gray-600">
-                            "Inscríbete y expande tu increíble conocimiento."
-                        </p>
+                        <div class="flex items-center justify-between flex-wrap gap-3">
+                            <p class="text-gray-600">
+                                "Inscríbete y expande tu increíble conocimiento."
+                            </p>
+                            {#if myCourses.length > 0}
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm font-medium border border-blue-100">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                    {myCourses.length} {myCourses.length === 1 ? 'curso inscrito' : 'cursos inscritos'}
+                                </span>
+                            {/if}
+                        </div>
                     </Card>
 
                     <h3 class="text-2xl font-bold text-gray-800 mb-4">
                         Mis Cursos Actuales
                     </h3>
                     {#if loading}
-                        <p class="text-gray-500">Cargando tus cursos...</p>
+                        <div class="flex items-center gap-3 text-gray-500 py-4">
+                            <svg class="animate-spin w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            <span>Cargando cursos...</span>
+                        </div>
                     {:else if myCourses.length === 0}
                         <div
                             class="bg-blue-50 p-6 rounded-xl border border-blue-100"
@@ -333,7 +344,7 @@
                         >
                             {#each myCourses as curso}
                                 <Card
-                                    class="border-l-4 border-l-green-500 hover:shadow-md transition relative bg-white"
+                                    class="border-l-4 border-l-green-500 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 relative bg-white"
                                 >
                                     <Badge
                                         color="green"
@@ -366,7 +377,10 @@
                     <PageHeader title="Cursos Disponibles" />
 
                     {#if loading}
-                        <p class="text-gray-500">Cargando cursos...</p>
+                        <div class="flex items-center gap-3 text-gray-500 py-4">
+                            <svg class="animate-spin w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            <span>Cargando cursos...</span>
+                        </div>
                     {:else if availableCourses.length === 0}
                         <div
                             class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
@@ -380,7 +394,7 @@
                             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                         >
                             {#each availableCourses as curso}
-                                <Card class="hover:shadow-md transition">
+                                <Card class="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
                                     <h3
                                         class="text-xl font-bold text-blue-900 mb-2"
                                     >
@@ -569,6 +583,8 @@
                         </div>
                     </div>
                 {/if}
+                </div>
+                {/key}
             </div>
         {/if}
     </div>

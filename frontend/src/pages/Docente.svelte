@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { fade } from "svelte/transition";
     import { navigate } from "svelte-routing";
     import DataTable from "../components/DataTable.svelte";
     import Badge from "../components/ui/Badge.svelte";
@@ -350,6 +351,8 @@
 
             <!-- Contenido -->
             <div class="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
+                {#key currentView}
+                <div in:fade={{ duration: 180 }}>
                 {#if loading}
                     <div class="flex h-full items-center justify-center">
                         <p class="text-gray-500 font-medium">
@@ -503,7 +506,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {#each myCourses as curso}
                                 <Card
-                                    class="border-l-4 border-l-indigo-500 hover:shadow-md transition"
+                                    class="border-l-4 border-l-indigo-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
                                 >
                                     <h3
                                         class="text-xl font-bold text-indigo-800 mb-2"
@@ -554,7 +557,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {#each myCourses as curso}
                                     <Card
-                                        class="border-l-4 border-l-indigo-500 hover:shadow-md transition"
+                                        class="border-l-4 border-l-indigo-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
                                     >
                                         <h3
                                             class="text-xl font-bold text-indigo-800 mb-2"
@@ -683,6 +686,8 @@
                         </div>
                     {/if}
                 {/if}
+                </div>
+                {/key}
             </div>
         {/if}
     </div>

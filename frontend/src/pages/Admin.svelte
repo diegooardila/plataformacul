@@ -94,31 +94,31 @@
                 <li>
                     <button
                         on:click={() => { currentView = "usuarios"; isMobileMenuOpen = false; }}
-                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'usuarios' ? 'bg-blue-600 text-white shadow' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
+                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'usuarios' ? 'bg-blue-600 text-white shadow border-l-2 border-l-blue-300' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
                         >Gestionar Usuarios</button>
                 </li>
                 <li>
                     <button
                         on:click={() => { currentView = "cursos"; isMobileMenuOpen = false; }}
-                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'cursos' ? 'bg-blue-600 text-white shadow' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
+                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'cursos' ? 'bg-blue-600 text-white shadow border-l-2 border-l-blue-300' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
                         >Gestionar Cursos</button>
                 </li>
                 <li>
                     <button
                         on:click={() => { currentView = "inscripciones"; isMobileMenuOpen = false; }}
-                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'inscripciones' ? 'bg-blue-600 text-white shadow' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
+                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'inscripciones' ? 'bg-blue-600 text-white shadow border-l-2 border-l-blue-300' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
                         >Gestionar Inscripciones</button>
                 </li>
                 <li>
                     <button
                         on:click={() => { currentView = "reportes"; isMobileMenuOpen = false; }}
-                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'reportes' ? 'bg-blue-600 text-white shadow' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
+                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'reportes' ? 'bg-blue-600 text-white shadow border-l-2 border-l-blue-300' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
                         >Reportes</button>
                 </li>
                 <li>
                     <button
                         on:click={() => { currentView = "perfil"; isMobileMenuOpen = false; }}
-                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'perfil' ? 'bg-blue-600 text-white shadow' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
+                        class="w-full text-left px-3 py-2 rounded-lg font-medium text-sm transition {currentView === 'perfil' ? 'bg-blue-600 text-white shadow border-l-2 border-l-blue-300' : 'hover:bg-gray-700 text-gray-300 hover:text-white'}"
                         >Perfil</button>
                 </li>
             </ul>
