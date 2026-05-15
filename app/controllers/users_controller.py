@@ -14,8 +14,11 @@ class UserController:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO users (identity_document, first_name, middle_name, last_name, second_last_name, email, password_hash, role_id, faculty_id, status_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (usuario.identity_document, usuario.first_name, usuario.middle_name, usuario.last_name, usuario.second_last_name, usuario.email, usuario.password_hash, usuario.role_id, usuario.faculty_id, usuario.status_id))
             conn.commit()
+            cursor.execute("SELECT role_name FROM roles WHERE role_id = %s", (usuario.role_id,))
+            role_row = cursor.fetchone()
+            role_name = role_row[0] if role_row else str(usuario.role_id)
             full_name = f"{usuario.first_name} {usuario.last_name}"
-            notify_user_created(full_name, usuario.email, str(usuario.role_id))
+            notify_user_created(full_name, usuario.email, role_name)
             return {"resultado": "User created"}
         except psycopg2.Error as err:
             print(err)

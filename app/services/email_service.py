@@ -83,14 +83,14 @@ def _send_async(to_email: str, subject: str, html: str):
 def notify_user_created(full_name: str, user_email: str, role: str):
     subject = "Bienvenido a la Plataforma CUL"
     body = f"""
-        <h2>¡Bienvenido, {full_name}!</h2>
-        <p>Tu cuenta en la Plataforma CUL ha sido creada exitosamente.</p>
+        <h2>¡Hola, {full_name}!</h2>
+        <p>Tu cuenta en la <strong>Plataforma de Cursos Electivos CUL</strong> ha sido creada. Ya puedes explorar e inscribirte en los cursos disponibles para este periodo.</p>
         <div class="info-box">
             <p><strong>Correo:</strong> {user_email}</p>
-            <p><strong>Rol asignado:</strong> {role}</p>
+            <p><strong>Tipo de cuenta:</strong> {role}</p>
         </div>
-        <p>Ya puedes iniciar sesión con tu documento de identidad y la contraseña asignada por el administrador.</p>
-        <p>Si tienes alguna duda, comunícate con el área académica.</p>
+        <p>Ingresa con tu documento de identidad y la contraseña asignada por el administrador.</p>
+        <p>Si tienes alguna duda sobre los cursos electivos, comunícate con el área académica.</p>
     """
     html = _build_email(subject, body)
     _send_async(user_email, subject, html)
