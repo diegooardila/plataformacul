@@ -177,6 +177,12 @@
 
     $: if (!isDeleteModalOpen && deletingUserId !== null) deletingUserId = null;
 
+    $: isAdmin = form.role_id === 1;
+
+    function onRoleChange() {
+        if (form.role_id === 1) form.faculty_id = null;
+    }
+
     function closeDeleteModal() {
         isDeleteModalOpen = false;
         deletingUserId = null;
@@ -325,12 +331,12 @@
                 <Input id="pass" type="password" required={!editingUserId} placeholder={editingUserId ? "Dejar vacío para mantener la actual" : ""} bind:value={form.password_hash} label="Contraseña" />
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Select id="role_id" required bind:value={form.role_id} label="Rol" options={[
+                <Select id="role_id" required bind:value={form.role_id} on:change={onRoleChange} label="Rol" options={[
                     {value: 1, label: 'Administrador'},
                     {value: 2, label: 'Docente'},
                     {value: 3, label: 'Estudiante'}
                 ]} />
-                <Select id="fac_id" bind:value={form.faculty_id} label="Facultad" options={[
+                <Select id="fac_id" bind:value={form.faculty_id} disabled={isAdmin} label="Facultad" options={[
                     {value: '', label: 'N/A'},
                     {value: 1, label: 'Ingeniería de Sistemas'},
                     {value: 2, label: 'Medicina'},
